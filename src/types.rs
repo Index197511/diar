@@ -1,7 +1,4 @@
-#[macro_use]
-extern crate failure;
-
-#[derive(Fail)]
+#[derive(Fail, Debug)]
 pub enum ErrorKind {
     #[fail(display = "illegal argument")]
     IllegalArgument,

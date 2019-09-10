@@ -4,3 +4,4 @@ pub mod search_favorite;
 pub mod select_then_jump;
 
 pub mod types;
+#[macro_use] extern crate failure;
