@@ -2,6 +2,10 @@ extern crate diar;
 extern crate clap;
 
 use clap::{App, Arg, SubCommand};
+use diar::util;
+use diar::types;
+
+
 
 fn main() {
     let app = App::new("Let's bookmark directory you like!")
