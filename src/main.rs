@@ -2,9 +2,6 @@ extern crate diar;
 extern crate clap;
 
 use clap::{App, Arg, SubCommand};
-use diar::util;
-use diar::types;
-
 
 
 fn main() {

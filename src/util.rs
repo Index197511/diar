@@ -1,11 +1,11 @@
-mod diar::types::{ErrorKind};
-mod std::path::Path
+use std::path::Path;
+use super::types::ErrorKind;
 
-pub fn generate_path(path_str: String) -> Result<Path, ErrorKind> {
+pub fn generate_path(path_str: &str) -> Result<&Path, ErrorKind> {
     let path = Path::new(path_str);
     if path.exists() {
-        path
+        Ok(path)
     } else {
-        PathNotFound
+        Err(ErrorKind::PathNotFound)
     }
 }
