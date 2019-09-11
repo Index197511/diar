@@ -34,7 +34,7 @@ fn main() {
         )
         .subcommand(
             SubCommand::with_name("jump")
-                .about("jump to your favorite directory")
+                .about("Jump to your favorite directory")
             );
 
     let matches = app.get_matches();
