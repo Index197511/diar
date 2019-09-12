@@ -1,5 +1,6 @@
 extern crate diar;
 extern crate clap;
+extern crate sled;
 
 use clap::{App, Arg, SubCommand};
 
@@ -35,7 +36,7 @@ fn main() {
         )
         .subcommand(
             SubCommand::with_name("jump")
-                .about("jump to your favorite directory")
+                .about("Jump to your favorite directory")
             );
 
     let matches = app.get_matches();
@@ -45,7 +46,7 @@ fn main() {
             match name {
 
                 "add" => {
-
+                    
                 }
 
                 "delete" => {
@@ -72,6 +73,5 @@ fn main() {
         }
 
     }
-
 
 }
