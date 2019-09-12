@@ -3,7 +3,7 @@ extern crate sled;
 use std::path::Path;
 use sled::Db;
 
-pub fn seace_and_jump(db_path: &Path, searched_word: &str) -> Vec<(String, String)> {
+pub fn seace_and_jump(searched_word: &str, db_path: &Path) -> Vec<(String, String)> {
     let tree = Db::open(db_path).unwrap();
     let iter_tree = tree.iter();
     

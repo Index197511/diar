@@ -6,6 +6,11 @@ use clap::ArgMatches;
 use clap::{App, Arg, SubCommand};
 use std::path::Path;
 
+use diar::add_favorite;
+use diar::delete_favorite;
+use diar::list_favorite;
+use diar::jump_dir;
+
 fn main() {
     let db_path = Path::new("strage");
     let app = App::new("Let's bookmark directory you like!")
@@ -46,18 +51,26 @@ fn main() {
     match matches.subcommand_name() {
         Some(name) => match name {
             "add" => {
-                if let Some(path) = matches.get_name("add") {
-                    if let Some(name) = matches.get_name("add") {
-                        add_favorite::add
+                if let Some(path) = matches.get_path(name) {
+                    if let Some(name) = matches.get_name(name) {
+                        add_favorite::add_to_db(Path::new(&path), name, db_path);
                     }
                 }
             }
 
-            "delete" => {}
+            "delete" => {
+                if let Some(name) = matches.get_name(name) {
+                    delete_favorite::delete_from_db(&name, db_path);
+                }
+            }
 
-            "list" => {}
+            "list" => {
+                list_favorite::list(db_path)
+            }
 
-            "jump" => {}
+            "jump" => {
+                jump_dir::seace_and_jump(name, db_path);
+            }
 
             _ => {
                 println!();
@@ -89,11 +102,10 @@ impl GetFromArg for ArgMatches<'_> {
 fn get_arg(
     subcommand: &clap::ArgMatches,
     subcommand_name: &str,
-    valur_name: &str,
+    value_name: &str,
 ) -> Option<String> {
     subcommand
         .subcommand_matches(subcommand_name.to_string())
-        .unwrap()
-        .value_of(valur_name.to_string())
+        .and_then(|args| args.value_of(value_name.to_string()))
         .map(|name| name.to_string())
 }
