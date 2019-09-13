@@ -8,8 +8,8 @@ use std::path::Path;
 
 use diar::add_favorite;
 use diar::delete_favorite;
-use diar::list_favorite;
 use diar::jump_dir;
+use diar::list_favorite;
 
 fn main() {
     let db_path = Path::new("strage");
@@ -28,7 +28,7 @@ fn main() {
                 )
                 .arg(
                     Arg::with_name("name")
-                        .help("named path")
+                        .help("key to directory")
                         .takes_value(true)
                         .required(true),
                 ),
@@ -37,8 +37,8 @@ fn main() {
             SubCommand::with_name("delete")
                 .about("Delete a directory from favorite")
                 .arg(
-                    Arg::with_name("name")
-                        .help("named path")
+                    Arg::with_name("named directory")
+                        .help("named directory")
                         .takes_value(true)
                         .required(true),
                 ),
@@ -49,28 +49,26 @@ fn main() {
     let matches = app.get_matches();
 
     match matches.subcommand_name() {
-        Some(name) => match name {
+        Some(subcommand_name) => match subcommand_name {
             "add" => {
-                if let Some(path) = matches.get_path(name) {
-                    if let Some(name) = matches.get_name(name) {
-                        add_favorite::add_to_db(Path::new(&path), name, db_path);
+                if let Some(path_to_directory) = matches.get_path_to_directory(subcommand_name) {
+                    if let Some(key) = matches.get_key(subcommand_name) {
+                        add_favorite::add_to_db(Path::new(&path_to_directory), key, db_path);
                     }
                 }
             }
 
             "delete" => {
-                if let Some(name) = matches.get_name(name) {
-                    delete_favorite::delete_from_db(&name, db_path);
+                if let Some(key) = matches.get_key(subcommand_name) {
+                    delete_favorite::delete_from_db(&key, db_path);
                 }
             }
 
-            "list" => {
-                list_favorite::list(db_path)
-            }
+            "list" => list_favorite::list(db_path),
 
             "jump" => {
-                if let Some(name) = matches.get_name(name) {
-                    jump_dir::search_and_jump(name, db_path);
+                if let Some(key) = matches.get_key(subcommand_name) {
+                    jump_dir::search_and_jump(key, db_path);
                 }
             }
 
@@ -87,21 +85,21 @@ fn main() {
 }
 
 trait GetFromArg {
-    fn get_name(&self, subcommand: &str) -> Option<String>;
-    fn get_path(&self, subcommand: &str) -> Option<String>;
+    fn get_key(&self, subcommand_name: &str) -> Option<String>;
+    fn get_path_to_directory(&self, subcommand_name: &str) -> Option<String>;
 }
 
 impl GetFromArg for ArgMatches<'_> {
-    fn get_name(&self, subcommand: &str) -> Option<String> {
-        get_arg(self, subcommand, "name")
+    fn get_key(&self, subcommand_name: &str) -> Option<String> {
+        get_value_from_args(self, subcommand_name, "name")
     }
 
-    fn get_path(&self, subcommand: &str) -> Option<String> {
-        get_arg(self, subcommand, "path")
+    fn get_path_to_directory(&self, subcommand_name: &str) -> Option<String> {
+        get_value_from_args(self, subcommand_name, "path")
     }
 }
 
-fn get_arg(
+fn get_value_from_args(
     subcommand: &clap::ArgMatches,
     subcommand_name: &str,
     value_name: &str,
