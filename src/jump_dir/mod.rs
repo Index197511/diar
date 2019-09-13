@@ -3,6 +3,10 @@ extern crate sled;
 use std::path::Path;
 use sled::Db;
 
+pub fn search_and_jump(name: String, db_path: &Path) -> () {
+    ()
+}
+
 
 pub fn search(searched_word: &str, db_path: &Path) -> Vec<(String, String)> {
     let tree = Db::open(db_path).unwrap();
