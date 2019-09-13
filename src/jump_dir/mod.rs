@@ -14,7 +14,7 @@ pub fn search_and_jump(user_input: String, db_path: &Path) -> () {
         }
 
         _ => {
-
+            search(&user_input, db_path);
             
         }
     }
