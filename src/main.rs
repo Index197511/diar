@@ -69,7 +69,9 @@ fn main() {
             }
 
             "jump" => {
-                jump_dir::seace_and_jump(name, db_path);
+                if let Some(name) = matches.get_name(name) {
+                    jump_dir::search_and_jump(name, db_path);
+                }
             }
 
             _ => {
