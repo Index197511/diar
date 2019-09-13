@@ -3,12 +3,27 @@ extern crate sled;
 use std::path::Path;
 use sled::Db;
 
-pub fn search_and_jump(name: String, db_path: &Path) -> () {
-    ()
+pub fn search_and_jump(user_input: String, db_path: &Path) -> () {
+    let tree = Db::open(db_path).unwrap();
+    let some_value = tree.get(&user_input);
+
+    match some_value {
+        Ok(Some(path)) => {
+            let converted_str: String = String::from_utf8(path.to_vec()).unwrap();
+            jump(Path::new(&converted_str));
+        }
+
+        _ => {
+
+            
+        }
+    }
+
+
 }
 
 
-pub fn search(searched_word: &str, db_path: &Path) -> Vec<(String, String)> {
+fn search(searched_word: &str, db_path: &Path) -> Vec<(String, String)> {
     let tree = Db::open(db_path).unwrap();
     let iter_tree = tree.iter();
     
@@ -25,6 +40,6 @@ pub fn search(searched_word: &str, db_path: &Path) -> Vec<(String, String)> {
 }
 
 
-pub fn jump(dest_dir: &Path) -> () {
+fn jump(dest_dir: &Path) -> () {
     println!("{}", dest_dir.to_str().unwrap());
 }
