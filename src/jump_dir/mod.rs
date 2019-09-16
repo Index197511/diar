@@ -6,7 +6,7 @@ use sled::Db;
 pub fn search_and_jump(user_input: String, db_path: &Path) -> () {
     let tree = Db::open(db_path).unwrap();
     let some_value = tree.get(&user_input);
-
+    println!("jump");
     match some_value {
         Ok(Some(path)) => {
             let converted_str: String = String::from_utf8(path.to_vec()).unwrap();
@@ -14,8 +14,7 @@ pub fn search_and_jump(user_input: String, db_path: &Path) -> () {
         }
 
         _ => {
-            search(&user_input, db_path);
-            
+           println!("Not found") 
         }
     }
 
@@ -42,4 +41,10 @@ fn search(searched_word: &str, db_path: &Path) -> Vec<(String, String)> {
 
 fn jump(dest_dir: &Path) -> () {
     println!("{}", dest_dir.to_str().unwrap());
+}
+
+fn read<T: std::str::FromStr> () -> T {
+    let mut l = String::new();
+    std::io::stdin().read_line(&mut l).ok();
+    l.trim().parse().ok().unwrap()
 }

@@ -37,14 +37,25 @@ fn main() {
             SubCommand::with_name("delete")
                 .about("Delete a directory from favorite")
                 .arg(
-                    Arg::with_name("named directory")
+                    // rename "named_directory" "name"
+                    Arg::with_name("name")
                         .help("named directory")
                         .takes_value(true)
                         .required(true),
                 ),
         )
         .subcommand(SubCommand::with_name("list").about("Display a favorite directory list"))
-        .subcommand(SubCommand::with_name("jump").about("Jump to your favorite directory"));
+        .subcommand(
+            SubCommand::with_name("jump")
+                .about("Jump to your favorite directory")
+                .arg(
+                    // rename "key" "name"
+                    Arg::with_name("name")
+                    .help("favorite dirs key")
+                    .takes_value(true)
+                    .required(true)
+                    )
+            );
 
     let matches = app.get_matches();
 
