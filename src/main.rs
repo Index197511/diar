@@ -27,7 +27,7 @@ fn main() {
                         .required(true),
                 )
                 .arg(
-                    Arg::with_name("name")
+                    Arg::with_name("key")
                         .help("key to directory")
                         .takes_value(true)
                         .required(true),
@@ -37,8 +37,7 @@ fn main() {
             SubCommand::with_name("delete")
                 .about("Delete a directory from favorite")
                 .arg(
-                    // rename "named_directory" "name"
-                    Arg::with_name("name")
+                    Arg::with_name("key")
                         .help("named directory")
                         .takes_value(true)
                         .required(true),
@@ -49,8 +48,7 @@ fn main() {
             SubCommand::with_name("jump")
                 .about("Jump to your favorite directory")
                 .arg(
-                    // rename "key" "name"
-                    Arg::with_name("name")
+                    Arg::with_name("key")
                     .help("favorite dirs key")
                     .takes_value(true)
                     .required(true)
@@ -102,7 +100,7 @@ trait GetFromArg {
 
 impl GetFromArg for ArgMatches<'_> {
     fn get_key(&self, subcommand_name: &str) -> Option<String> {
-        get_value_from_args(self, subcommand_name, "name")
+        get_value_from_args(self, subcommand_name, "key")
     }
 
     fn get_path_to_directory(&self, subcommand_name: &str) -> Option<String> {
