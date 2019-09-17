@@ -5,5 +5,11 @@ use sled::Db;
 
 pub fn delete_from_db(key: &str, db_path: &Path) {
     let tree = Db::open(db_path).unwrap();
-    tree.del(key);
+    match tree.get(key) {
+        Ok(Some(_p)) => {
+            tree.del(key);
+            println!("done");
+        }
+        _ => println!("This key does not exist!: {}", key)
+    };
 }
