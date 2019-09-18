@@ -21,7 +21,7 @@ pub fn search_and_jump(user_input: String, db_path: &Path) -> () {
 
 }
 
-
+#[warn(dead_code)]
 fn search(searched_word: &str, db_path: &Path) -> Vec<(String, String)> {
     let tree = Db::open(db_path).unwrap();
     let iter_tree = tree.iter();
@@ -43,6 +43,7 @@ fn jump(dest_dir: &Path) -> () {
     println!("{}", dest_dir.to_str().unwrap());
 }
 
+#[warn(dead_code)]
 fn read<T: std::str::FromStr> () -> T {
     let mut l = String::new();
     std::io::stdin().read_line(&mut l).ok();
