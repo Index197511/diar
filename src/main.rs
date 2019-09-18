@@ -60,15 +60,15 @@ fn main() {
     match matches.subcommand_name() {
         Some(subcommand_name) => match subcommand_name {
             "add" => {
-                if let Some(path_to_directory) = matches.get_path_to_directory(subcommand_name) {
-                    if let Some(key) = matches.get_key(subcommand_name) {
+                if let Some(path_to_directory) = matches.get_value(subcommand_name, "path") {
+                    if let Some(key) = matches.get_value(subcommand_name, "key") {
                         add_favorite::add_to_db(Path::new(&path_to_directory), key, db_path);
                     }
                 }
             }
 
             "delete" => {
-                if let Some(key) = matches.get_key(subcommand_name) {
+                if let Some(key) = matches.get_value(subcommand_name, "key") {
                     delete_favorite::delete_from_db(&key, db_path);
                 }
             }
@@ -76,7 +76,7 @@ fn main() {
             "list" => list_favorite::list(db_path),
 
             "jump" => {
-                if let Some(key) = matches.get_key(subcommand_name) {
+                if let Some(key) = matches.get_value(subcommand_name, "key") {
                     jump_dir::search_and_jump(key, db_path);
                 }
             }
@@ -94,27 +94,18 @@ fn main() {
 }
 
 trait GetFromArg {
-    fn get_key(&self, subcommand_name: &str) -> Option<String>;
-    fn get_path_to_directory(&self, subcommand_name: &str) -> Option<String>;
+    fn get_value(&self, subcommand_name: &str, value_name: &str) -> Option<String>;
 }
 
 impl GetFromArg for ArgMatches<'_> {
-    fn get_key(&self, subcommand_name: &str) -> Option<String> {
-        get_value_from_args(self, subcommand_name, "key")
+    fn get_value(
+        &self,
+        subcommand_name: &str,
+        value_name: &str,
+    ) -> Option<String> {
+        self
+            .subcommand_matches(subcommand_name.to_string())
+            .and_then(|args| args.value_of(value_name.to_string()))
+            .map(|name| name.to_string())
     }
-
-    fn get_path_to_directory(&self, subcommand_name: &str) -> Option<String> {
-        get_value_from_args(self, subcommand_name, "path")
-    }
-}
-
-fn get_value_from_args(
-    subcommand: &clap::ArgMatches,
-    subcommand_name: &str,
-    value_name: &str,
-) -> Option<String> {
-    subcommand
-        .subcommand_matches(subcommand_name.to_string())
-        .and_then(|args| args.value_of(value_name.to_string()))
-        .map(|name| name.to_string())
 }
