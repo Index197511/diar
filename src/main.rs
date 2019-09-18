@@ -1,10 +1,12 @@
 extern crate clap;
 extern crate diar;
 extern crate sled;
+extern crate dirs;
 
 use clap::ArgMatches;
 use clap::{App, Arg, SubCommand};
 use std::path::Path;
+use dirs::home_dir;
 
 use diar::add_favorite;
 use diar::delete_favorite;
@@ -12,7 +14,8 @@ use diar::jump_dir;
 use diar::list_favorite;
 
 fn main() {
-    let db_path = Path::new("strage");
+    let users_db = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.dir");
+    let db_path = Path::new(&users_db);
     let app = App::new("Let's bookmark directory you like!")
         .version("0.1.0")
         .author("Index197511 and 4afS")

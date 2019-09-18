@@ -6,7 +6,6 @@ use sled::Db;
 pub fn search_and_jump(user_input: String, db_path: &Path) -> () {
     let tree = Db::open(db_path).unwrap();
     let some_value = tree.get(&user_input);
-    println!("jump");
     match some_value {
         Ok(Some(path)) => {
             let converted_str: String = String::from_utf8(path.to_vec()).unwrap();
