@@ -8,7 +8,6 @@ pub fn delete_from_db(key: &str, db_path: &Path) {
     match tree.get(key) {
         Ok(Some(_p)) => {
             let _ = tree.remove(key);
-            println!("done");
         }
         _ => println!("This key does not exist!: {}", key)
     };
