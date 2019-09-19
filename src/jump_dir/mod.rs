@@ -25,7 +25,6 @@ pub fn search_and_jump(user_input: String, db_path: &Path) -> () {
 
 }
 
-#[warn(dead_code)]
 fn search(searched_word: &str, tree: sled::Db) -> Vec<(String, String)> {
     let iter_tree = tree.iter();
     
