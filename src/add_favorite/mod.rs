@@ -2,6 +2,7 @@ extern crate sled;
 
 use sled::Db;
 use std::path::Path;
+use std::env;
 
 pub fn add_to_db(path: &Path, key: String, db_path: &Path) -> () {
     let tree = Db::open(db_path).unwrap();
