@@ -1,18 +1,18 @@
 extern crate clap;
 extern crate diar;
-extern crate sled;
 extern crate dirs;
+extern crate sled;
 
 use clap::ArgMatches;
 use clap::{App, Arg, SubCommand};
-use std::path::Path;
 use dirs::home_dir;
+use std::path::Path;
 
 use diar::add_favorite;
+use diar::clear_db;
 use diar::delete_favorite;
 use diar::jump_dir;
 use diar::list_favorite;
-use diar::clear_db;
 
 fn main() {
     let users_db = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.dir");
@@ -27,8 +27,9 @@ fn main() {
                 .arg(
                     Arg::with_name("path")
                         .help("absolute path")
-
-                        .required(true),
+                        .short("p")
+                        .long("paht")
+                        .takes_value(true)
                 )
                 .arg(
                     Arg::with_name("key")
@@ -45,8 +46,7 @@ fn main() {
                         .help("named directory")
                         .takes_value(true)
                         .required(true),
-                )
-                ,
+                ),
         )
         .subcommand(SubCommand::with_name("list").about("Display a favorite directory list"))
         .subcommand(
@@ -54,11 +54,11 @@ fn main() {
                 .about("Jump to your favorite directory")
                 .arg(
                     Arg::with_name("key")
-                    .help("favorite dirs key")
-                    .takes_value(true)
-                    .required(true)
-                    )
-            )
+                        .help("favorite dirs key")
+                        .takes_value(true)
+                        .required(true),
+                ),
+        )
         .subcommand(SubCommand::with_name("clear").about("Clear fav dirs."));
 
     let matches = app.get_matches();
@@ -66,9 +66,13 @@ fn main() {
     match matches.subcommand_name() {
         Some(subcommand_name) => match subcommand_name {
             "add" => {
-                if let Some(path_to_directory) = matches.get_value(subcommand_name, "path") {
-                    if let Some(key) = matches.get_value(subcommand_name, "key") {
-                        add_favorite::add_to_db(Path::new(&path_to_directory), key, db_path);
+                if let Some(key) = matches.get_value(subcommand_name, "key") {
+                    if matches.is_present("path") {
+                        if let Some(path_to_directory) = matches.get_value(subcommand_name, "path") {
+                            add_favorite::add_to_db(Some(Path::new(&path_to_directory)), key, db_path);
+                        }
+                    } else {
+                        add_favorite::add_to_db(None, key, db_path);
                     }
                 }
             }
@@ -86,7 +90,7 @@ fn main() {
                     jump_dir::search_and_jump(key, db_path);
                 }
             }
-            "clear" => clear_db::clear_db(db_path), 
+            "clear" => clear_db::clear_db(db_path),
 
             _ => {
                 println!();
@@ -105,13 +109,8 @@ trait GetFromArg {
 }
 
 impl GetFromArg for ArgMatches<'_> {
-    fn get_value(
-        &self,
-        subcommand_name: &str,
-        value_name: &str,
-    ) -> Option<String> {
-        self
-            .subcommand_matches(subcommand_name.to_string())
+    fn get_value(&self, subcommand_name: &str, value_name: &str) -> Option<String> {
+        self.subcommand_matches(subcommand_name.to_string())
             .and_then(|args| args.value_of(value_name.to_string()))
             .map(|name| name.to_string())
     }
