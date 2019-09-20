@@ -28,7 +28,7 @@ fn main() {
                     Arg::with_name("path")
                         .help("absolute path")
                         .short("p")
-                        .long("paht")
+                        .long("path")
                         .takes_value(true)
                 )
                 .arg(
