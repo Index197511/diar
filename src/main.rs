@@ -1,6 +1,5 @@
 extern crate clap;
 extern crate diar;
-extern crate dirs;
 extern crate sled;
 
 use clap::ArgMatches;
@@ -8,11 +7,11 @@ use clap::{App, Arg, SubCommand};
 use dirs::home_dir;
 use std::path::Path;
 
-use diar::add_favorite;
-use diar::clear_db;
-use diar::delete_favorite;
-use diar::jump_dir;
-use diar::list_favorite;
+mod add_favorite;
+mod clear_db;
+mod delete_favorite;
+mod jump_dir;
+mod list_favorite;
 
 fn main() {
     let users_db = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.dir");

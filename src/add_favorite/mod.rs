@@ -1,5 +1,3 @@
-extern crate sled;
-
 use sled::Db;
 use std::path::Path;
 use std::env;
