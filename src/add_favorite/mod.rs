@@ -4,7 +4,7 @@ use std::env;
 
 use diar::util::print_done_if_ok;
 
-pub fn add_to_diar(maybe_path_given: Option<&Path>, key: String, db_path: &Path) -> () {
+pub fn add_favorite(maybe_path_given: Option<&Path>, key: String, db_path: &Path) -> () {
     let db = Db::open(db_path).unwrap();
     match db.get(&key) {
         Ok(Some(_)) => {

@@ -1,5 +1,4 @@
 extern crate clap;
-extern crate diar;
 extern crate sled;
 
 use clap::ArgMatches;
@@ -69,14 +68,14 @@ fn main() {
                     if matches.is_present("path") {
                         if let Some(path_to_directory) = matches.get_value(subcommand_name, "path")
                         {
-                            add_favorite::add_to_diar(
+                            add_favorite::add_favorite(
                                 Some(Path::new(&path_to_directory)),
                                 key,
                                 db_path,
                             );
                         }
                     } else {
-                        add_favorite::add_to_diar(None, key, db_path);
+                        add_favorite::add_favorite(None, key, db_path);
                     }
                 }
             }
@@ -91,7 +90,7 @@ fn main() {
 
             "jump" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    jump_dir::search_and_jump(key, db_path);
+                    jump_dir::jump_if_matched(key, db_path);
                 }
             }
             "clear" => clear_db::clear_db(db_path),
