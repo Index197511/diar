@@ -6,11 +6,11 @@ use clap::{App, Arg, SubCommand};
 use dirs::home_dir;
 use std::path::Path;
 
-mod add_favorite;
-mod clear_db;
-mod delete_favorite;
-mod jump_dir;
-mod list_favorite;
+mod add;
+mod clear;
+mod delete;
+mod jump;
+mod list;
 
 fn main() {
     let users_db = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.dir");
@@ -68,32 +68,32 @@ fn main() {
                     if matches.is_present("path") {
                         if let Some(path_to_directory) = matches.get_value(subcommand_name, "path")
                         {
-                            add_favorite::add_favorite(
+                            add::add_favorite(
                                 Some(Path::new(&path_to_directory)),
                                 key,
                                 db_path,
                             );
                         }
                     } else {
-                        add_favorite::add_favorite(None, key, db_path);
+                        add::add_favorite(None, key, db_path);
                     }
                 }
             }
 
             "delete" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    delete_favorite::delete_from_db(&key, db_path);
+                    delete::delete_from_db(&key, db_path);
                 }
             }
 
-            "list" => list_favorite::list(db_path),
+            "list" => list::list_favorites(db_path),
 
             "jump" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    jump_dir::jump_if_matched(key, db_path);
+                    jump::jump_if_matched(key, db_path);
                 }
             }
-            "clear" => clear_db::clear_db(db_path),
+            "clear" => clear::clear_db(db_path),
             _ => {
                 println!();
             }
