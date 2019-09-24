@@ -20,7 +20,7 @@ pub fn add_favorite(maybe_path_given: Option<&Path>, key: String, db_path: &Path
                     }
                 }
                 None => {
-                    add_current_to_db(key, db);
+                    add_current_path_to_db(key, db);
                 }
             }
         }
@@ -31,7 +31,7 @@ fn add_path_to_db(path: &Path, key: String, db: sled::Db) -> () {
      print_done_if_ok(db.insert(key, path.to_str().unwrap().as_bytes().to_vec()))
 }
 
-fn add_current_to_db(key: String, db: sled::Db) -> () {
+fn add_current_path_to_db(key: String, db: sled::Db) -> () {
     match env::current_dir() {
         Ok(current_path) => print_done_if_ok(db.insert(key, current_path.to_str().unwrap().as_bytes().to_vec())),
         Err(e) => println!("{}", e),
