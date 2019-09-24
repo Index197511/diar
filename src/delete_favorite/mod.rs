@@ -5,7 +5,7 @@ pub fn delete_from_db(key: &str, db_path: &Path) {
     let tree = Db::open(db_path).unwrap();
     match tree.get(key) {
         Ok(Some(_p)) => {
-            let _ = tree.remove(key);
+            tree.remove(key);
         }
         _ => println!("This key does not exist!: {}", key)
     };
