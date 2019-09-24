@@ -28,7 +28,7 @@ fn main() {
                         .help("absolute path")
                         .short("p")
                         .long("path")
-                        .takes_value(true)
+                        .takes_value(true),
                 )
                 .arg(
                     Arg::with_name("key")
@@ -67,8 +67,13 @@ fn main() {
             "add" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
                     if matches.is_present("path") {
-                        if let Some(path_to_directory) = matches.get_value(subcommand_name, "path") {
-                            add_favorite::add_to_diar(Some(Path::new(&path_to_directory)), key, db_path);
+                        if let Some(path_to_directory) = matches.get_value(subcommand_name, "path")
+                        {
+                            add_favorite::add_to_diar(
+                                Some(Path::new(&path_to_directory)),
+                                key,
+                                db_path,
+                            );
                         }
                     } else {
                         add_favorite::add_to_diar(None, key, db_path);
@@ -90,7 +95,6 @@ fn main() {
                 }
             }
             "clear" => clear_db::clear_db(db_path),
-
             _ => {
                 println!();
             }
