@@ -1,47 +1,63 @@
-use std::path::Path;
 use sled::Db;
+use std::path::Path;
 
-// use diar::util::print_done_if_ok;
+type Favorite = (String, String);
 
-pub fn search_and_jump(user_input: String, db_path: &Path) -> () {
+pub fn jump_if_matched(user_input: String, db_path: &Path) -> () {
     let db = Db::open(db_path).unwrap();
-    let matched_value = db.get(&user_input);
-    match matched_value {
+    let maybe_path_matched = db.get(&user_input);
+
+    match maybe_path_matched {
         Ok(Some(path)) => {
-            let converted_str: String = String::from_utf8(path.to_vec()).unwrap();
-            jump(Path::new(&converted_str));
+            let path_string: String = String::from_utf8(path.to_vec()).unwrap();
+            jump(Path::new(&path_string));
         }
-
         _ => {
-            let favorites = search(&user_input, db); 
-            println!("Is this what you are jumping?");
-            for (key, path) in favorites {
-                println!(" key: {}, path: {}", key, path);
-            }
+            suggest(search(&user_input, db));
         }
-
     }
-
-
 }
-
-fn search(searched_word: &str, db: sled::Db) -> Vec<(String, String)> {
-    let iter_tree = db.iter();
-    
-    let mut favorites: Vec<(String, String)> = Vec::new();
-
-    for t in iter_tree {
-        let unwrapped_keyvalue = t.unwrap();
-        let key: String = String::from_utf8(unwrapped_keyvalue.0.to_vec()).unwrap();
-        let value: String = String::from_utf8(unwrapped_keyvalue.1.to_vec()).unwrap();
-        favorites.push((key, value));
-    }
-    let fav_dir = favorites.into_iter().filter(|(k, _)| k.contains(searched_word)).collect::<Vec<(String, String)>>();
-    fav_dir
-}
-
 
 fn jump(dest_dir: &Path) -> () {
     println!("{}", dest_dir.to_str().unwrap());
 }
 
+fn suggest(searched: Vec<Favorite>) -> () {
+    println!("Is this what you are jumping?");
+    for (key, path) in searched {
+        println!("       {} -> {}", key, path);
+    }
+}
+
+fn search(searched_word: &str, db: sled::Db) -> Vec<Favorite> {
+    let iter_db = db.iter();
+    let favorites = get_favorites(iter_db);
+
+    favorites
+        .into_iter()
+        .filter(|(key, _)| key.contains(searched_word))
+        .collect::<Vec<Favorite>>()
+}
+
+fn get_favorites(iter_db: sled::Iter<'_>) -> Vec<Favorite> {
+    let mut favorites: Vec<Favorite> = Vec::new();
+    let favorites_utf8 = iter_db.filter(|result| result.is_ok()).map(|ok| ok.unwrap());
+
+    for converted_favorite in favorites_utf8.map(|favorite_utf8| from_utf8s(favorite_utf8)) {
+        if let Some(favorite) = converted_favorite {
+            favorites.push(favorite);
+        }
+    }
+
+    favorites
+}
+
+fn from_utf8s(favorite_ivec: (sled::IVec, sled::IVec)) -> Option<Favorite> {
+    let key_utf8 = favorite_ivec.0.to_vec();
+    let path_utf8 = favorite_ivec.1.to_vec();
+
+    match (String::from_utf8(key_utf8), String::from_utf8(path_utf8)) {
+        (Ok(key), Ok(path)) => Some((key, path)),
+        _ => None,
+    }
+}

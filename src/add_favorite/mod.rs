@@ -4,14 +4,14 @@ use std::env;
 
 use diar::util::print_done_if_ok;
 
-pub fn add_to_diar(optional_path: Option<&Path>, key: String, db_path: &Path) -> () {
+pub fn add_to_diar(maybe_path_given: Option<&Path>, key: String, db_path: &Path) -> () {
     let db = Db::open(db_path).unwrap();
     match db.get(&key) {
         Ok(Some(_)) => {
             println!("already exist!");
         }
         _ => {
-            match optional_path {
+            match maybe_path_given {
                 Some(path) => {
                     if path.exists() {
                         add_path_to_db(path, key, db);
