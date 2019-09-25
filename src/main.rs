@@ -1,6 +1,4 @@
 extern crate clap;
-extern crate diar;
-extern crate dirs;
 extern crate sled;
 
 use clap::ArgMatches;
@@ -8,17 +6,17 @@ use clap::{App, Arg, SubCommand};
 use dirs::home_dir;
 use std::path::Path;
 
-use diar::add_favorite;
-use diar::clear_db;
-use diar::delete_favorite;
-use diar::jump_dir;
-use diar::list_favorite;
+mod add;
+mod clear;
+mod delete;
+mod jump;
+mod list;
 
 fn main() {
     let users_db = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.dir");
     let db_path = Path::new(&users_db);
     let app = App::new("Let's bookmark directory you like!")
-        .version("0.1.0")
+        .version("1.0.1")
         .author("Index197511 and 4afS")
         .about("A directory favorite tool in Rust.")
         .subcommand(
@@ -29,7 +27,7 @@ fn main() {
                         .help("absolute path")
                         .short("p")
                         .long("path")
-                        .takes_value(true)
+                        .takes_value(true),
                 )
                 .arg(
                     Arg::with_name("key")
@@ -68,30 +66,34 @@ fn main() {
             "add" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
                     if matches.is_present("path") {
-                        if let Some(path_to_directory) = matches.get_value(subcommand_name, "path") {
-                            add_favorite::add_to_db(Some(Path::new(&path_to_directory)), key, db_path);
+                        if let Some(path_to_directory) = matches.get_value(subcommand_name, "path")
+                        {
+                            add::add_favorite(
+                                Some(Path::new(&path_to_directory)),
+                                key,
+                                db_path,
+                            );
                         }
                     } else {
-                        add_favorite::add_to_db(None, key, db_path);
+                        add::add_favorite(None, key, db_path);
                     }
                 }
             }
 
             "delete" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    delete_favorite::delete_from_db(&key, db_path);
+                    delete::delete_from_db(&key, db_path);
                 }
             }
 
-            "list" => list_favorite::list(db_path),
+            "list" => list::list_favorites(db_path),
 
             "jump" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    jump_dir::search_and_jump(key, db_path);
+                    jump::jump_if_matched(key, db_path);
                 }
             }
-            "clear" => clear_db::clear_db(db_path),
-
+            "clear" => clear::clear_db(db_path),
             _ => {
                 println!();
             }

@@ -51,7 +51,7 @@ A directory favorite tool in Rust.
         diar jump $1
         flag=1
       fi
-      fi [[ $1 = "-h" ]]; then
+      if [[ $1 = "-h" ]]; then
         diar jump $1
       fi
       if [[ $flag -ne 1 ]]; then
