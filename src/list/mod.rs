@@ -8,7 +8,7 @@ pub fn list_favorites(db_path: &Path) -> () {
     let iter_db = db.iter() ;
 
     for (key, path) in get_favorites(iter_db) {
-        println!("{} -> {}", key, path);
+        println!("        {} -> {}", key, path);
 
     }
 }
