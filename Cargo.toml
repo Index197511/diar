@@ -1,13 +1,17 @@
 [package]
 name = "diar"
-version = "0.1.0"
-authors = ["index197511"]
+version = "1.0.1"
+authors = ["index197511", "4afS"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT"
+description = "A directory favorite tool in rust"
+repository = "https://github.com/Index197511/diar"
+readme = "README.md"
+keyword = ["directory", "bookmark", "rust"]
 
 [dependencies]
 sled = "0.27"
 clap = "2.31"
 failure = "0.1"
 failure_derive = "0.1"
+dirs = "2.0.2"
