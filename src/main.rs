@@ -23,7 +23,7 @@ fn main() {
             SubCommand::with_name("add")
                 .about("Add a directory you like to favorite")
                 .arg(
-                    Arg::with_name("directory path")
+                    Arg::with_name("path")
                         .help("absolute path")
                         .short("p")
                         .long("path")
