@@ -65,19 +65,10 @@ fn main() {
         Some(subcommand_name) => match subcommand_name {
             "add" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    if matches.is_present("directory path") {
-                        println!("flag path is true!");
-                        if let Some(path_to_directory) = matches.get_value(subcommand_name, "path")
-                        {
-                            add::add_favorite(
-                                Some(Path::new(&path_to_directory)),
-                                key,
-                                db_path,
-                            );
-                        }
-                    } else {
-                        println!("flag path is false!");
-                        add::add_favorite(None, key, db_path);
+                    match matches.get_value(subcommand_name, "path")
+                    {
+                        Some(path_to_directory) => add::add_favorite(Some(Path::new(&path_to_directory)), key, db_path),
+                        None => add::add_favorite(None, key, db_path),
                     }
                 }
             }
