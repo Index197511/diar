@@ -23,7 +23,7 @@ fn main() {
             SubCommand::with_name("add")
                 .about("Add a directory you like to favorite")
                 .arg(
-                    Arg::with_name("path")
+                    Arg::with_name("directory path")
                         .help("absolute path")
                         .short("p")
                         .long("path")
@@ -65,7 +65,8 @@ fn main() {
         Some(subcommand_name) => match subcommand_name {
             "add" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    if matches.is_present("path") {
+                    if matches.is_present("directory path") {
+                        println!("flag path is true!");
                         if let Some(path_to_directory) = matches.get_value(subcommand_name, "path")
                         {
                             add::add_favorite(
@@ -75,6 +76,7 @@ fn main() {
                             );
                         }
                     } else {
+                        println!("flag path is false!");
                         add::add_favorite(None, key, db_path);
                     }
                 }
