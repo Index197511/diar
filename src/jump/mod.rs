@@ -4,7 +4,7 @@ use std::path::Path;
 use diar::types::Favorite;
 use diar::util::get_favorites;
 
-pub fn jump_if_matched(user_input: String, db_path: &Path) -> () {
+pub fn jump_if_matched(user_input: String, db_path: &Path) {
     let db = Db::open(db_path).unwrap();
     let maybe_path_matched = db.get(&user_input);
 
@@ -19,11 +19,11 @@ pub fn jump_if_matched(user_input: String, db_path: &Path) -> () {
     }
 }
 
-fn jump(dest_dir: &Path) -> () {
+fn jump(dest_dir: &Path) {
     println!("{}", dest_dir.to_str().unwrap());
 }
 
-fn suggest(searched: Vec<Favorite>) -> () {
+fn suggest(searched: Vec<Favorite>) {
     println!("Is this what you are jumping?");
     for (key, path) in searched {
         println!("       {} -> {}", key, path);
