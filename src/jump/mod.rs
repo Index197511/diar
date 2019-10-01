@@ -1,8 +1,8 @@
 use sled::Db;
 use std::path::Path;
 
-use diar::util::get_favorites;
 use diar::types::Favorite;
+use diar::util::get_favorites;
 
 pub fn jump_if_matched(user_input: String, db_path: &Path) -> () {
     let db = Db::open(db_path).unwrap();

@@ -1,5 +1,5 @@
-use std::path::Path;
 use sled::Db;
+use std::path::Path;
 
 use diar::util::print_done_if_ok;
 
