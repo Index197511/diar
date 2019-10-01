@@ -95,7 +95,6 @@ fn main() {
 
         None => {
             println!("Please give args");
-            return;
         }
     }
 }
