@@ -65,9 +65,10 @@ fn main() {
         Some(subcommand_name) => match subcommand_name {
             "add" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    match matches.get_value(subcommand_name, "path")
-                    {
-                        Some(path_to_directory) => add::add_favorite(Some(Path::new(&path_to_directory)), key, db_path),
+                    match matches.get_value(subcommand_name, "path") {
+                        Some(path_to_directory) => {
+                            add::add_favorite(Some(Path::new(&path_to_directory)), key, db_path)
+                        }
                         None => add::add_favorite(None, key, db_path),
                     }
                 }
@@ -94,7 +95,6 @@ fn main() {
 
         None => {
             println!("Please give args");
-            return;
         }
     }
 }
