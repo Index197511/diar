@@ -46,7 +46,7 @@ fn main() {
                         .required(true),
                 ),
         )
-        .subcommand(SubCommand::with_name("list").about("Display a favorite directory list"))
+        .subcommand(SubCommand::with_name("list").about("List favorite directories"))
         .subcommand(
             SubCommand::with_name("jump")
                 .about("Jump to your favorite directory")
@@ -57,7 +57,7 @@ fn main() {
                         .required(true),
                 ),
         )
-        .subcommand(SubCommand::with_name("clear").about("Clear fav dirs."));
+        .subcommand(SubCommand::with_name("clear").about("Delete all favorite directories."));
 
     let matches = app.get_matches();
 
@@ -94,7 +94,7 @@ fn main() {
         },
 
         None => {
-            println!("Please give args");
+            println!("diar: try 'diar --help' for more information");
         }
     }
 }
