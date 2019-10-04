@@ -12,6 +12,4 @@ keywords = ["directory", "bookmark", "rust"]
 [dependencies]
 sled = "0.27"
 clap = "2.31"
-failure = "0.1"
-failure_derive = "0.1"
 dirs = "2.0.2"
