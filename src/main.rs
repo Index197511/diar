@@ -49,19 +49,19 @@ fn main() {
         )
         .subcommand(
             SubCommand::with_name("rename")
-            .about("Rename favorite directory")
-            .arg(
-                Arg::with_name("old_key")
-                .help("old key")
-                .takes_value(true)
-                .required(true)
-            )
-            .arg(
-                Arg::with_name("new_key")
-                .help("new key")
-                .takes_value(true)
-                .required(true)
-            )
+                .about("Rename favorite directory")
+                .arg(
+                    Arg::with_name("old_key")
+                        .help("old key to favorite directory")
+                        .takes_value(true)
+                        .required(true),
+                )
+                .arg(
+                    Arg::with_name("new_key")
+                        .help("new key to favorite directory")
+                        .takes_value(true)
+                        .required(true),
+                ),
         )
         .subcommand(SubCommand::with_name("list").about("List favorite directories"))
         .subcommand(
