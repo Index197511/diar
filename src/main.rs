@@ -11,6 +11,7 @@ mod clear;
 mod delete;
 mod jump;
 mod list;
+mod rename;
 
 fn main() {
     let users_db = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.dir");
@@ -46,6 +47,22 @@ fn main() {
                         .required(true),
                 ),
         )
+        .subcommand(
+            SubCommand::with_name("rename")
+            .about("Rename favorite directory")
+            .arg(
+                Arg::with_name("old_key")
+                .help("old key")
+                .takes_value(true)
+                .required(true)
+            )
+            .arg(
+                Arg::with_name("new_key")
+                .help("new key")
+                .takes_value(true)
+                .required(true)
+            )
+        )
         .subcommand(SubCommand::with_name("list").about("List favorite directories"))
         .subcommand(
             SubCommand::with_name("jump")
@@ -77,6 +94,14 @@ fn main() {
             "delete" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
                     delete::delete_from_db(&key, db_path);
+                }
+            }
+
+            "rename" => {
+                if let Some(old_key) = matches.get_value(subcommand_name, "old_key") {
+                    if let Some(new_key) = matches.get_value(subcommand_name, "new_key") {
+                        rename::rename_favorite(old_key, new_key, db_path);
+                    }
                 }
             }
 
