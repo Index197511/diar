@@ -1,6 +1,6 @@
 [package]
 name = "diar"
-version = "1.0.2"
+version = "1.0.3"
 authors = ["index197511", "4afS"]
 edition = "2018"
 license = "MIT"
