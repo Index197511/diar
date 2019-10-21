@@ -14,19 +14,23 @@ A directory favorite tool in Rust.
     
     `diar add -p /path/to/directory foo`
 
-- Show the list of added to diar:
+- Rename a favorites from `foo` to `bar`:
 
-  `diar list`
+  - `diar rename foo bar`
 
-- Delete `foo` from diar:
+- Delete `bar` from diar:
   
-  `diar delete foo`
+  `diar delete bar`
 
 - Jump to `foo` that added directory path to diar:
 
   `diar-jump foo`
 
   Don't forget the `-`, please wait for the future ;(
+
+- Show the list of added to diar:
+
+  `diar list`
 
 - For more options refer to help:
 
@@ -40,7 +44,7 @@ A directory favorite tool in Rust.
 
   - `curl -sSf https://static.rust-lang.org/rustup.sh | sh`
 
-- Add the following to your `.bashrc`
+- Add the following to your `$HOME.bashrc`
 
   ```bash
   diar-jump(){

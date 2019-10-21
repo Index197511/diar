@@ -11,6 +11,7 @@ mod clear;
 mod delete;
 mod jump;
 mod list;
+mod rename;
 
 fn main() {
     let users_db = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.dir");
@@ -46,7 +47,23 @@ fn main() {
                         .required(true),
                 ),
         )
-        .subcommand(SubCommand::with_name("list").about("Display a favorite directory list"))
+        .subcommand(
+            SubCommand::with_name("rename")
+                .about("Rename favorite directory")
+                .arg(
+                    Arg::with_name("old_key")
+                        .help("old key to favorite directory")
+                        .takes_value(true)
+                        .required(true),
+                )
+                .arg(
+                    Arg::with_name("new_key")
+                        .help("new key to favorite directory")
+                        .takes_value(true)
+                        .required(true),
+                ),
+        )
+        .subcommand(SubCommand::with_name("list").about("List favorite directories"))
         .subcommand(
             SubCommand::with_name("jump")
                 .about("Jump to your favorite directory")
@@ -57,7 +74,7 @@ fn main() {
                         .required(true),
                 ),
         )
-        .subcommand(SubCommand::with_name("clear").about("Clear fav dirs."));
+        .subcommand(SubCommand::with_name("clear").about("Delete all favorite directories."));
 
     let matches = app.get_matches();
 
@@ -65,9 +82,10 @@ fn main() {
         Some(subcommand_name) => match subcommand_name {
             "add" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    match matches.get_value(subcommand_name, "path")
-                    {
-                        Some(path_to_directory) => add::add_favorite(Some(Path::new(&path_to_directory)), key, db_path),
+                    match matches.get_value(subcommand_name, "path") {
+                        Some(path_to_directory) => {
+                            add::add_favorite(Some(Path::new(&path_to_directory)), key, db_path)
+                        }
                         None => add::add_favorite(None, key, db_path),
                     }
                 }
@@ -76,6 +94,14 @@ fn main() {
             "delete" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
                     delete::delete_from_db(&key, db_path);
+                }
+            }
+
+            "rename" => {
+                if let Some(old_key) = matches.get_value(subcommand_name, "old_key") {
+                    if let Some(new_key) = matches.get_value(subcommand_name, "new_key") {
+                        rename::rename_favorite(old_key, new_key, db_path);
+                    }
                 }
             }
 
@@ -93,8 +119,7 @@ fn main() {
         },
 
         None => {
-            println!("Please give args");
-            return;
+            println!("diar: try 'diar --help' for more information");
         }
     }
 }
