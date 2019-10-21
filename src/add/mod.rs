@@ -1,6 +1,7 @@
 use sled::Db;
 use std::env;
 use std::path::Path;
+use std::fs;
 
 use diar::util::print_done_if_ok;
 
@@ -13,7 +14,7 @@ pub fn add_favorite(maybe_path_given: Option<&Path>, key: String, db_path: &Path
         _ => match maybe_path_given {
             Some(path) => {
                 if path.exists() {
-                    add_path_to_db(path, key, db);
+                    add_path_to_db(fs::canonicalize(path).unwrap().as_path(), key, db);
                 } else {
                     println!("This path does not exist!: {}", path.to_str().unwrap());
                 }
