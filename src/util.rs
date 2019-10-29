@@ -35,3 +35,21 @@ fn from_utf8s(favorite_ivec: (sled::IVec, sled::IVec)) -> Option<Favorite> {
         _ => None,
     }
 }
+
+pub fn suggest(searched: Vec<Favorite>) {
+    println!("Is this what you are looking for?");
+    for (key, path) in searched {
+        println!("       {} -> {}", key, path);
+    }
+}
+
+pub fn search(searched_word: &str, db: sled::Db) -> Vec<Favorite> {
+    let iter_db = db.iter();
+    let favorites = get_favorites(iter_db);
+
+    favorites
+        .into_iter()
+        .filter(|(key, _)| key.contains(searched_word))
+        .collect::<Vec<Favorite>>()
+}
+

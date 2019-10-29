@@ -1,6 +1,10 @@
 [package]
 name = "diar"
+<<<<<<< HEAD
 version = "1.0.3"
+=======
+version = "2.0.0"
+>>>>>>> remotes/origin/develop
 authors = ["index197511", "4afS"]
 edition = "2018"
 license = "MIT"
