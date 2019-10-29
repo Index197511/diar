@@ -17,8 +17,8 @@ mod ls;
 fn main() {
     let users_db = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.dir");
     let db_path = Path::new(&users_db);
-    let app = App::new("Let's bookmark directory you like!")
-        .version("1.0.3")
+    let app = App::new("diar")
+        .version("2.0.0")
         .author("Index197511 and 4afS")
         .about("A directory favorite tool in Rust.")
         .subcommand(
