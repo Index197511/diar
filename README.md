@@ -26,6 +26,10 @@ A directory favorite tool in Rust.
 
   `diar-jump foo`
 
+  Or, you'd like to jump to the current project root directory:
+
+  `diar-jump -p`
+
   Don't forget the `-`, please wait for the future ;(
 
 - Show the list of added to diar:
