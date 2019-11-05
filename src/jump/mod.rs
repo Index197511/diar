@@ -1,12 +1,20 @@
 use sled::Db;
 use std::path::Path;
+use std::process::Command;
 
-use diar::types::Favorite;
+use diar::types::{Favorite, GetProjectRootError, JumpTo};
 use diar::util::get_favorites;
 
-pub fn jump_if_matched(user_input: String, db_path: &Path) {
+pub fn jump_to(to: JumpTo, db_path: &Path) {
     let db = Db::open(db_path).unwrap();
-    let maybe_path_matched = db.get(&user_input);
+    match to {
+        JumpTo::Key(key) => jump_to_key(&key, db),
+        JumpTo::ProjectRoot => jump_to_project_root(),
+    }
+}
+
+fn jump_to_key(key: &str, db: sled::Db) {
+    let maybe_path_matched = db.get(key);
 
     match maybe_path_matched {
         Ok(Some(path)) => {
@@ -14,7 +22,40 @@ pub fn jump_if_matched(user_input: String, db_path: &Path) {
             jump(Path::new(&path_string));
         }
         _ => {
-            suggest(search(&user_input, db));
+            suggest(key, search(key, db));
+        }
+    }
+}
+
+fn get_project_root_path() -> Result<String, GetProjectRootError> {
+    let output = Command::new("sh")
+        .arg("-c")
+        .arg("git rev-parse --show-toplevel")
+        .output();
+
+    match output {
+        Ok(output) => {
+            if output.status.success() {
+                Ok(String::from_utf8(output.stdout)
+                    .unwrap()
+                    .trim_end()
+                    .to_string())
+            } else {
+                Err(GetProjectRootError::DotGitNotFound)
+            }
+        }
+        Err(_) => Err(GetProjectRootError::GitCommandNotFound),
+    }
+}
+
+fn jump_to_project_root() {
+    match get_project_root_path() {
+        Ok(path_string) => jump(Path::new(&path_string)),
+        Err(GetProjectRootError::DotGitNotFound) => {
+            println!("Error: .git directory not found.");
+        }
+        Err(GetProjectRootError::GitCommandNotFound) => {
+            println!("Error: Command 'git' not found.");
         }
     }
 }
@@ -23,7 +64,8 @@ fn jump(dest_dir: &Path) {
     println!("{}", dest_dir.to_str().unwrap());
 }
 
-fn suggest(searched: Vec<Favorite>) {
+fn suggest(input: &str, searched: Vec<Favorite>) {
+    println!("Error: Key '{}' not found.\n", input);
     println!("Is this what you are jumping?");
     for (key, path) in searched {
         println!("       {} -> {}", key, path);

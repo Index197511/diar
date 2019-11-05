@@ -44,19 +44,21 @@ A directory favorite tool in Rust.
 
   - `curl -sSf https://static.rust-lang.org/rustup.sh | sh`
 
-- Add the following to your `$HOME.bashrc`
+- Add the following to your `$HOME.bashrc` or others
 
   ```bash
   diar-jump(){
     local selected=$(diar jump $1)
     local flag=0
+
     if [[ -n $selected ]]; then
-      if [ $(echo $selected | grep -e "Is this what you are jumping?") ]; then
+      if [[ $selected =~ "Error:" ]]; then
         diar jump $1
         flag=1
       fi
       if [[ $1 = "-h" ]]; then
         diar jump $1
+        flag=1
       fi
       if [[ $flag -ne 1 ]]; then
         \cd $selected
