@@ -12,8 +12,7 @@ pub fn ls_favorite(key: String, db_path: &Path) {
             ls(path_string);
         }
         _ => {
-            suggest(search(&key, db));
-
+            suggest(&key, search(&key, db));
         }
     }
 }
