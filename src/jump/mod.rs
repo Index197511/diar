@@ -21,7 +21,7 @@ fn jump_to_key(key: &str, db: sled::Db) {
             jump(Path::new(&path_string));
         }
         _ => {
-            suggest(search(key, db));
+            suggest(key, search(key, db));
         }
     }
 }
