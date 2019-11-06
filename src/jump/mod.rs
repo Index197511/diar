@@ -1,8 +1,8 @@
+use diar::types::{GetProjectRootError, JumpTo};
+use diar::util::{search, suggest};
 use sled::Db;
 use std::path::Path;
 use std::process::Command;
-use diar::util::{suggest, search};
-use diar::types::{JumpTo, GetProjectRootError};
 
 pub fn jump_to(to: JumpTo, db_path: &Path) {
     let db = Db::open(db_path).unwrap();
@@ -62,4 +62,3 @@ fn jump_to_project_root() {
 fn jump(dest_dir: &Path) {
     println!("{}", dest_dir.to_str().unwrap());
 }
-
