@@ -1,15 +1,26 @@
-extern crate sled;
 extern crate colored;
+extern crate sled;
 
 use colored::Colorize;
 
 use std::fmt::Display;
 
-use super::types::Favorite;
+use super::types::{CommandName, Favorite};
 
-pub fn print_done_if_ok<T, E: Display>(result: Result<T, E>) {
+pub fn print_result<T, E: Display>(result: Result<T, E>, command_name: CommandName) {
     match result {
-        Ok(_) => println!("done"),
+        Ok(_) => match command_name {
+            CommandName::Added((key, path)) => {
+                println!("{} {} -> {}", "added:".bold().bright_green(), key, path)
+            }
+            CommandName::Deleted((key, path)) => {
+                println!("{} {} -> {}", "deleted:".bold().bright_green(), key, path)
+            }
+            CommandName::Cleared => println!("{}", "cleared".bold().bright_green()),
+            CommandName::Renamed(o_key, n_key) => {
+                println!("{} {} -> {}", "rename:".bold().bright_green(), o_key, n_key)
+            }
+        },
         Err(e) => println!("{}", e),
     }
 }
@@ -40,7 +51,11 @@ fn from_utf8s(favorite_ivec: (sled::IVec, sled::IVec)) -> Option<Favorite> {
 }
 
 pub fn suggest(input: &str, searched: Vec<Favorite>) {
-    println!("{} Key '{}' not found.\n", "error:".bold().bright_red(), input);
+    println!(
+        "{} Key '{}' not found.\n",
+        "error:".bold().bright_red(),
+        input
+    );
     println!("Is this what you are looking for?");
     for (key, path) in searched {
         println!("       {} -> {}", key, path);
@@ -56,4 +71,3 @@ pub fn search(searched_word: &str, db: sled::Db) -> Vec<Favorite> {
         .filter(|(key, _)| key.contains(searched_word))
         .collect::<Vec<Favorite>>()
 }
-
