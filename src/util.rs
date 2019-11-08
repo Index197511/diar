@@ -1,7 +1,7 @@
 extern crate sled;
 extern crate colored;
 
-use colored::*;
+use colored::Colorize;
 
 use std::fmt::Display;
 
