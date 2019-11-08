@@ -1,7 +1,4 @@
 extern crate sled;
-extern crate colored;
-
-use colored::Colorize;
 
 use std::fmt::Display;
 
@@ -40,7 +37,7 @@ fn from_utf8s(favorite_ivec: (sled::IVec, sled::IVec)) -> Option<Favorite> {
 }
 
 pub fn suggest(input: &str, searched: Vec<Favorite>) {
-    println!("{} Key '{}' not found.\n", "error:".bold().bright_red(), input);
+    println!("Error: Key '{}' not found.\n", input);
     println!("Is this what you are looking for?");
     for (key, path) in searched {
         println!("       {} -> {}", key, path);

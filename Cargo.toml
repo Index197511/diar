@@ -1,6 +1,6 @@
 [package]
 name = "diar"
-version = "2.1.1"
+version = "2.1.0"
 authors = ["index197511", "4afS"]
 edition = "2018"
 license = "MIT"
@@ -13,4 +13,3 @@ keywords = ["directory", "bookmark", "rust"]
 sled = "0.27"
 clap = "2.31"
 dirs = "2.0.2"
-colored = "1.8.0"
