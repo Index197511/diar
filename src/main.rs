@@ -3,6 +3,7 @@ extern crate sled;
 
 use clap::ArgMatches;
 use clap::{App, Arg, SubCommand};
+use diar::types::JumpTo;
 use dirs::home_dir;
 use std::path::Path;
 
@@ -18,7 +19,7 @@ fn main() {
     let users_db = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.dir");
     let db_path = Path::new(&users_db);
     let app = App::new("diar")
-        .version("2.0.0")
+        .version("2.1.1")
         .author("Index197511 and 4afS")
         .about("A directory favorite tool in Rust.")
         .subcommand(
@@ -67,17 +68,22 @@ fn main() {
         .subcommand(SubCommand::with_name("list").about("List favorite directories"))
         .subcommand(
             SubCommand::with_name("jump")
-                .about("Jump to your favorite directory")
+                .about("Jump to your favorite directory or root directory of the project")
                 .arg(
                     Arg::with_name("key")
                         .help("favorite dirs key")
-                        .takes_value(true)
-                        .required(true),
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::with_name("project-root")
+                        .help("The current project root directory")
+                        .long("project-root")
+                        .short("p"),
                 ),
         )
         .subcommand(SubCommand::with_name("clear").about("Delete all favorite directories."))
         .subcommand(SubCommand::with_name("ls")
-                    .about("ls your favorite dir.")
+                    .about("ls your favorite directory")
                     .arg(
                         Arg::with_name("key")
                             .help("favorite dir's key")
@@ -118,8 +124,14 @@ fn main() {
             "list" => list::list_favorites(db_path),
 
             "jump" => {
-                if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    jump::jump_if_matched(key, db_path);
+                if let Some(subcommand_matches) = matches.subcommand_matches(subcommand_name) {
+                    if subcommand_matches.is_present("project-root") {
+                        jump::jump_to(JumpTo::ProjectRoot, db_path);
+                    } else {
+                        if let Some(key) = matches.get_value(subcommand_name, "key") {
+                            jump::jump_to(JumpTo::Key(key), db_path);
+                        }
+                    }
                 }
             }
             "clear" => clear::clear_db(db_path),
