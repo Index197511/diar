@@ -52,20 +52,12 @@ A directory favorite tool in Rust.
 
   ```bash
   diar-jump(){
-    local selected=$(diar jump $1)
-    local flag=0
-
-    if [[ -n $selected ]]; then
-      if [[ $selected =~ "Error:" ]]; then
-        diar jump $1
-        flag=1
-      fi
-      if [[ $1 = "-h" ]]; then
-        diar jump $1
-        flag=1
-      fi
-      if [[ $flag -ne 1 ]]; then
-        \cd $selected
+    local result=$(diar jump $1)
+    if [ -n "$result" ]; then
+      if echo "$result" | grep -e "^Error:" > /dev/null || [ "$1" = "-h" ]; then
+        echo -e "$result"
+      else
+        \cd $result
       fi
     fi
   }
