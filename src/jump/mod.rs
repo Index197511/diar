@@ -21,11 +21,7 @@ fn jump_to_key(key: &str, db: sled::Db) {
             jump(Path::new(&path_string));
         }
         _ => {
-<<<<<<< HEAD
-            suggest(search(key, db));
-=======
             suggest(key, search(key, db));
->>>>>>> upstream/master
         }
     }
 }
