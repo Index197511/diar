@@ -12,14 +12,14 @@ mod clear;
 mod delete;
 mod jump;
 mod list;
-mod rename;
 mod ls;
+mod rename;
 
 fn main() {
     let users_db = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.dir");
     let db_path = Path::new(&users_db);
     let app = App::new("diar")
-        .version("2.1.0")
+        .version("2.2.0")
         .author("Index197511 and 4afS")
         .about("A directory favorite tool in Rust.")
         .subcommand(
@@ -68,7 +68,7 @@ fn main() {
         .subcommand(SubCommand::with_name("list").about("List favorite directories"))
         .subcommand(
             SubCommand::with_name("jump")
-                .about("Jump to your favorite directory or root firectory of the project")
+                .about("Jump to your favorite directory or root directory of the project")
                 .arg(
                     Arg::with_name("key")
                         .help("favorite dirs key")
@@ -82,15 +82,16 @@ fn main() {
                 ),
         )
         .subcommand(SubCommand::with_name("clear").about("Delete all favorite directories."))
-        .subcommand(SubCommand::with_name("ls")
-                    .about("ls your favorite directory")
-                    .arg(
-                        Arg::with_name("key")
-                            .help("favorite dir's key")
-                            .takes_value(true)
-                            .required(true),
-                        ),
-                    );
+        .subcommand(
+            SubCommand::with_name("ls")
+                .about("ls your favorite directory")
+                .arg(
+                    Arg::with_name("key")
+                        .help("favorite dir's key")
+                        .takes_value(true)
+                        .required(true),
+                ),
+        );
 
     let matches = app.get_matches();
 
@@ -109,7 +110,7 @@ fn main() {
 
             "delete" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    delete::delete_from_db(&key, db_path);
+                    delete::delete_from_db(key, db_path);
                 }
             }
 
@@ -138,7 +139,7 @@ fn main() {
             "ls" => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
                     ls::ls_favorite(key, db_path);
-                } 
+                }
             }
             _ => {
                 println!();

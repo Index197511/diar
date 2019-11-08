@@ -1,7 +1,7 @@
+use diar::util::{search, suggest};
 use sled::Db;
-use std::path::Path;
 use std::fs;
-use diar::util::{suggest, search};
+use std::path::Path;
 
 pub fn ls_favorite(key: String, db_path: &Path) {
     let db = Db::open(db_path).unwrap();
@@ -22,9 +22,22 @@ fn ls(path: String) {
     let mut files: Vec<String> = Vec::new();
 
     for p in fs::read_dir(&path).unwrap() {
-        files.push(p.unwrap().path().as_path().to_str().unwrap().replace(&path, ""));
+        files.push(
+            p.unwrap()
+                .path()
+                .as_path()
+                .to_str()
+                .unwrap()
+                .replace(&path, ""),
+        );
     }
 
-    let shaped_files = files.iter().fold(String::new(), |join, s| if join == String::new() {s.to_string()} else {join + "  " + s});
+    let shaped_files = files.iter().fold(String::new(), |join, s| {
+        if join == String::new() {
+            s.to_string()
+        } else {
+            join + "  " + s
+        }
+    });
     println!("{}", shaped_files);
 }
