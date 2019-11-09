@@ -1,18 +1,17 @@
 use diar::types::{GetProjectRootError, JumpTo};
-use diar::util::{search, suggest};
+use diar::util::{search, suggest, print_error};
 use sled::Db;
 use std::path::Path;
 use std::process::Command;
 
-pub fn jump_to(to: JumpTo, db_path: &Path) {
-    let db = Db::open(db_path).unwrap();
+pub fn jump_to(db: Db, to: JumpTo) {
     match to {
-        JumpTo::Key(key) => jump_to_key(&key, db),
+        JumpTo::Key(key) => jump_to_key(db, &key),
         JumpTo::ProjectRoot => jump_to_project_root(),
     }
 }
 
-fn jump_to_key(key: &str, db: sled::Db) {
+fn jump_to_key(db: Db, key: &str) {
     let maybe_path_matched = db.get(key);
 
     match maybe_path_matched {
@@ -51,10 +50,10 @@ fn jump_to_project_root() {
     match get_project_root_path() {
         Ok(path_string) => jump(Path::new(&path_string)),
         Err(GetProjectRootError::DotGitNotFound) => {
-            println!("Error: .git directory not found.");
+            print_error(".git directory not found.");
         }
         Err(GetProjectRootError::GitCommandNotFound) => {
-            println!("Error: Command 'git' not found.");
+            print_error("Command 'git' not found.");
         }
     }
 }

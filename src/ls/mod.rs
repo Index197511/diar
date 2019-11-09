@@ -1,10 +1,8 @@
 use diar::util::{search, suggest};
 use sled::Db;
 use std::fs;
-use std::path::Path;
 
-pub fn ls_favorite(key: String, db_path: &Path) {
-    let db = Db::open(db_path).unwrap();
+pub fn ls_favorite(db: Db, key: String) {
     let maybe_target = db.get(&key);
     match maybe_target {
         Ok(Some(path)) => {

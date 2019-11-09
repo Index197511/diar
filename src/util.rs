@@ -1,23 +1,26 @@
 extern crate colored;
 extern crate sled;
 
+use super::types::{CommandResult, Favorite};
 use colored::Colorize;
-
 use std::fmt::Display;
+use sled::Db;
 
-use super::types::{CommandName, Favorite};
+pub fn print_error(message: &str) {
+    println!("{} {}", "error:".bold().bright_red(), message)
+}
 
-pub fn print_result<T, E: Display>(result: Result<T, E>, command_name: CommandName) {
+pub fn print_result<T, E: Display>(result: Result<T, E>, command_name: CommandResult) {
     match result {
         Ok(_) => match command_name {
-            CommandName::Added((key, path)) => {
+            CommandResult::Added((key, path)) => {
                 println!("{} {} -> {}", "added:".bold().bright_green(), key, path)
             }
-            CommandName::Deleted((key, path)) => {
+            CommandResult::Deleted((key, path)) => {
                 println!("{} {} -> {}", "deleted:".bold().bright_green(), key, path)
             }
-            CommandName::Cleared => println!("{}", "cleared".bold().bright_green()),
-            CommandName::Renamed(o_key, n_key) => {
+            CommandResult::Cleared => println!("{}", "cleared".bold().bright_green()),
+            CommandResult::Renamed(o_key, n_key) => {
                 println!("{} {} -> {}", "rename:".bold().bright_green(), o_key, n_key)
             }
         },
@@ -51,18 +54,14 @@ fn from_utf8s(favorite_ivec: (sled::IVec, sled::IVec)) -> Option<Favorite> {
 }
 
 pub fn suggest(input: &str, searched: Vec<Favorite>) {
-    println!(
-        "{} Key '{}' not found.\n",
-        "error:".bold().bright_red(),
-        input
-    );
+    print_error(&format!("Key '{}' not found.\n", input));
     println!("Is this what you are looking for?");
     for (key, path) in searched {
         println!("       {} -> {}", key, path);
     }
 }
 
-pub fn search(searched_word: &str, db: sled::Db) -> Vec<Favorite> {
+pub fn search(searched_word: &str, db: Db) -> Vec<Favorite> {
     let iter_db = db.iter();
     let favorites = get_favorites(iter_db);
 

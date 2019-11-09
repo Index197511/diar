@@ -10,7 +10,7 @@ pub enum GetProjectRootError {
     DotGitNotFound,
 }
 
-pub enum CommandName {
+pub enum CommandResult {
     Added(Favorite),
     Deleted(Favorite),
     Cleared,
