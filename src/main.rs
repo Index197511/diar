@@ -3,7 +3,7 @@ extern crate sled;
 
 use clap::ArgMatches;
 use clap::{App, Arg, SubCommand};
-use diar::command::*;
+use diar::command::{Command, to_command};
 use diar::types::JumpTo;
 use dirs::home_dir;
 use sled::Db;
@@ -146,7 +146,7 @@ fn main() {
 
             Some(Command::Ls) => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    ls::ls_favorite(db, key);
+                    ls::ls_at_favorite(db, key);
                 }
             }
 

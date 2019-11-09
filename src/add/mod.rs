@@ -3,8 +3,8 @@ use std::env;
 use std::fs;
 use std::path::Path;
 
-use diar::types::CommandResult;
-use diar::util::{print_error, print_result};
+use diar::command::{CommandResult, print_result};
+use diar::error::print_error;
 
 pub fn add_favorite(db: Db, key: String, path: Option<&Path>) {
     match db.get(&key) {
@@ -21,7 +21,7 @@ pub fn add_favorite(db: Db, key: String, path: Option<&Path>) {
 fn add_path_to_db(db: Db, key: String, path: &Path) {
     print_result(
         db.insert(&key, path.to_str().unwrap().as_bytes().to_vec()),
-        CommandResult::Added((key, path.to_str().unwrap().to_owned())),
+        CommandResult::Added(key, path.to_str().unwrap().to_owned()),
     );
 }
 

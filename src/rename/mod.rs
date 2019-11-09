@@ -1,7 +1,6 @@
 use sled::Db;
 
-use diar::types::CommandResult;
-use diar::util::print_result;
+use diar::command::{CommandResult, print_result};
 
 pub fn rename_favorite(db: Db, old_key: String, new_key: String) {
     match db.get(&old_key) {

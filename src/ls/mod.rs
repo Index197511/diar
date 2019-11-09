@@ -1,18 +1,13 @@
-use diar::util::{search, suggest};
+use diar::util::search;
+use diar::error::suggest;
 use sled::Db;
 use std::fs;
 
-pub fn ls_favorite(db: Db, key: String) {
-    let maybe_target = db.get(&key);
-    match maybe_target {
-        Ok(Some(path)) => {
-            let path_string: String = String::from_utf8(path.to_vec()).unwrap();
-            ls(path_string);
-        }
-        _ => {
-            suggest(&key, search(&key, db));
-
-        }
+pub fn ls_at_favorite(db: Db, key: String) {
+    let target = db.get(&key);
+    match target {
+        Ok(Some(path)) => ls(String::from_utf8(path.to_vec()).unwrap()),
+        _ => suggest(&key, search(&key, db)),
     }
 }
 

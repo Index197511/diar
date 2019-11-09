@@ -1,5 +1,6 @@
-use diar::types::{GetProjectRootError, JumpTo};
-use diar::util::{search, suggest, print_error};
+use diar::types::JumpTo;
+use diar::util::search;
+use diar::error::{GetProjectRootError, suggest, print_error};
 use sled::Db;
 use std::path::Path;
 use std::process::Command;
