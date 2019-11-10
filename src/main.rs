@@ -6,6 +6,7 @@ use clap::{App, Arg, SubCommand};
 use diar::types::JumpTo;
 use dirs::home_dir;
 use std::path::Path;
+use std::fs;
 
 mod add;
 mod clear;
@@ -16,8 +17,13 @@ mod ls;
 mod rename;
 
 fn main() {
-    let users_db = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.dir");
-    let db_path = Path::new(&users_db);
+    let users_db_path = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.diar");
+    let db_path = Path::new(&users_db_path);
+    let old_db_path = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.dir");
+    let renamed_db_path = Path::new(&old_db_path);
+    if renamed_db_path.exists() {
+        let _ = fs::rename(&renamed_db_path, &users_db_path);
+    }
     let app = App::new("diar")
         .version("2.2.0")
         .author("Index197511 and 4afS")
