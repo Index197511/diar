@@ -4,9 +4,9 @@ extern crate sled;
 use clap::ArgMatches;
 use clap::{App, Arg, SubCommand};
 use diar::types::JumpTo;
-use dirs::home_dir;
-use std::path::Path;
+use diar::util::generate_path_string;
 use std::fs;
+use std::path::Path;
 
 mod add;
 mod clear;
@@ -17,13 +17,13 @@ mod ls;
 mod rename;
 
 fn main() {
-    let users_db_path = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.diar");
+    let users_db_path = generate_path_string("/.diar".to_owned());
     let db_path = Path::new(&users_db_path);
-    let old_db_path = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.dir");
-    let renamed_db_path = Path::new(&old_db_path);
-    if renamed_db_path.exists() {
-        let _ = fs::rename(&renamed_db_path, &users_db_path);
-    }
+    let _ = fs::rename(
+        Path::new(&generate_path_string("/.dir".to_owned())),
+        db_path,
+    );
+
     let app = App::new("diar")
         .version("2.2.0")
         .author("Index197511 and 4afS")

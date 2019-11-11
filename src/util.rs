@@ -5,6 +5,8 @@ use colored::Colorize;
 
 use std::fmt::Display;
 
+use dirs::home_dir;
+
 use super::types::{CommandName, Favorite};
 
 pub fn print_result<T, E: Display>(result: Result<T, E>, command_name: CommandName) {
@@ -70,4 +72,8 @@ pub fn search(searched_word: &str, db: sled::Db) -> Vec<Favorite> {
         .into_iter()
         .filter(|(key, _)| key.contains(searched_word))
         .collect::<Vec<Favorite>>()
+}
+
+pub fn generate_path_string(s: String) -> String {
+    format!("{}{}", home_dir().unwrap().to_str().unwrap(), s)
 }
