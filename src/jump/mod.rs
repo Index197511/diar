@@ -1,6 +1,6 @@
 use diar::types::JumpTo;
 use diar::util::search;
-use diar::error::{GetProjectRootFailed, suggest, print_error};
+use diar::error::{GetProjectRootFailed, suggest, error};
 use sled::Db;
 use std::path::Path;
 use std::process::Command;
@@ -51,10 +51,10 @@ fn jump_to_project_root() {
     match get_project_root_path() {
         Ok(path_string) => jump(Path::new(&path_string)),
         Err(GetProjectRootFailed::DotGitNotFound) => {
-            print_error(".git directory not found.");
+            error(".git directory not found.");
         }
         Err(GetProjectRootFailed::GitCommandNotFound) => {
-            print_error("Command 'git' not found.");
+            error("Command 'git' not found.");
         }
     }
 }

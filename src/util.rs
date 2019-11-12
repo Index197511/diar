@@ -3,9 +3,10 @@ extern crate sled;
 use super::types::Favorite;
 use sled::Db;
 
-pub fn get_favorites(iter_db: sled::Iter<'_>) -> Vec<Favorite> {
+pub fn get_favorites(db: Db) -> Vec<Favorite> {
     let mut favorites: Vec<Favorite> = Vec::new();
-    let favorites_utf8 = iter_db
+    let favorites_utf8 = db
+        .iter()
         .filter(|maybe_favorite| maybe_favorite.is_ok())
         .map(|ok_favorite| ok_favorite.unwrap());
 
@@ -35,8 +36,7 @@ pub fn print_favorites(favorites: Vec<Favorite>) {
 }
 
 pub fn search(searched_word: &str, db: Db) -> Vec<Favorite> {
-    let iter_db = db.iter();
-    let favorites = get_favorites(iter_db);
+    let favorites = get_favorites(db);
 
     favorites
         .into_iter()

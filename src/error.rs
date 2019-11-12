@@ -9,12 +9,12 @@ pub enum GetProjectRootFailed {
     DotGitNotFound,
 }
 
-pub fn print_error(message: &str) {
-    println!("{} {}", "error:".bold().bright_red(), message)
+pub fn error(message: &str) {
+    println!("{} {}", "error:".bold().bright_red(), message);
 }
 
 pub fn suggest(input: &str, searched: Vec<Favorite>) {
-    print_error(&format!("Key '{}' not found.\n", input));
+    error(&format!("Key '{}' not found.\n", input));
     println!("Is this what you are looking for?");
     print_favorites(searched)
 }

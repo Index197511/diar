@@ -2,6 +2,7 @@ extern crate colored;
 
 use colored::Colorize;
 use std::fmt::Display;
+use super::types::Key;
 
 pub enum Command {
     Add,
@@ -14,10 +15,10 @@ pub enum Command {
 }
 
 pub enum CommandResult {
-    Added(String, String),
-    Deleted(String, String),
+    Added(Key, String),
+    Deleted(Key, String),
     Cleared,
-    Renamed(String, String),
+    Renamed(Key, Key),
 }
 
 pub fn to_command(command: &str) -> Option<Command> {

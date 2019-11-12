@@ -1,9 +1,10 @@
 use std::path::Path;
 
-pub type Favorite = (String, String);
+pub type Key = String;
+pub type Favorite = (Key, String);
 
 pub enum JumpTo {
-    Key(String),
+    Key(Key),
     ProjectRoot,
 }
 

@@ -4,13 +4,13 @@ use std::fs;
 use std::path::Path;
 
 use diar::command::{CommandResult, print_result};
-use diar::error::print_error;
+use diar::error::error;
 use diar::types::WhereToAdd;
 
 pub fn add_favorite(db: Db, key: String, path: WhereToAdd) {
     match db.get(&key) {
         Ok(Some(_)) => {
-            print_error("This path already exist!");
+            error("This path already exist!");
         }
         _ => match path {
             WhereToAdd::Path(path) => add_given_path_to_db(db, key, path),
@@ -30,7 +30,7 @@ fn add_given_path_to_db(db: Db, key: String, path: &Path) {
     if path.exists() {
         add_path_to_db(db, key, fs::canonicalize(path).unwrap().as_path());
     } else {
-        print_error(&format!(
+        error(&format!(
             "This path does not exist: {}",
             path.to_str().unwrap()
         ));
