@@ -4,7 +4,7 @@ use colored::Colorize;
 use super::types::Favorite;
 use super::util::print_favorites;
 
-pub enum GetProjectRootError {
+pub enum GetProjectRootFailed {
     GitCommandNotFound,
     DotGitNotFound,
 }

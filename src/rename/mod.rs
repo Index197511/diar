@@ -1,6 +1,7 @@
 use sled::Db;
 
-use diar::command::{CommandResult, print_result};
+use diar::command::{print_result, CommandResult};
+use diar::error::print_error;
 
 pub fn rename_favorite(db: Db, old_key: String, new_key: String) {
     match db.get(&old_key) {
@@ -12,7 +13,7 @@ pub fn rename_favorite(db: Db, old_key: String, new_key: String) {
             );
         }
         _ => {
-            println!("This key does not exist: {}", old_key);
+            print_error(&format!("This key does not exist: {}", old_key));
         }
     }
 }

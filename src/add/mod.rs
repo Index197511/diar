@@ -5,15 +5,16 @@ use std::path::Path;
 
 use diar::command::{CommandResult, print_result};
 use diar::error::print_error;
+use diar::types::WhereToAdd;
 
-pub fn add_favorite(db: Db, key: String, path: Option<&Path>) {
+pub fn add_favorite(db: Db, key: String, path: WhereToAdd) {
     match db.get(&key) {
         Ok(Some(_)) => {
             print_error("This path already exist!");
         }
         _ => match path {
-            Some(path) => add_given_path_to_db(db, key, path),
-            None => add_current_path_to_db(db, key),
+            WhereToAdd::Path(path) => add_given_path_to_db(db, key, path),
+            WhereToAdd::CurrentDirectory => add_current_path_to_db(db, key),
         },
     }
 }

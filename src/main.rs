@@ -4,7 +4,7 @@ extern crate sled;
 use clap::ArgMatches;
 use clap::{App, Arg, SubCommand};
 use diar::command::{Command, to_command};
-use diar::types::JumpTo;
+use diar::types::{JumpTo, WhereToAdd};
 use dirs::home_dir;
 use sled::Db;
 use std::path::Path;
@@ -107,9 +107,9 @@ fn main() {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
                     match matches.get_value(subcommand_name, "path") {
                         Some(given_path) => {
-                            add::add_favorite(db, key, Some(Path::new(&given_path)))
+                            add::add_favorite(db, key, WhereToAdd::Path(Path::new(&given_path)))
                         }
-                        None => add::add_favorite(db, key, None),
+                        None => add::add_favorite(db, key, WhereToAdd::CurrentDirectory),
                     }
                 }
             }

@@ -1,6 +1,6 @@
 use diar::types::JumpTo;
 use diar::util::search;
-use diar::error::{GetProjectRootError, suggest, print_error};
+use diar::error::{GetProjectRootFailed, suggest, print_error};
 use sled::Db;
 use std::path::Path;
 use std::process::Command;
@@ -26,7 +26,7 @@ fn jump_to_key(db: Db, key: &str) {
     }
 }
 
-fn get_project_root_path() -> Result<String, GetProjectRootError> {
+fn get_project_root_path() -> Result<String, GetProjectRootFailed> {
     let output = Command::new("sh")
         .arg("-c")
         .arg("git rev-parse --show-toplevel")
@@ -40,25 +40,25 @@ fn get_project_root_path() -> Result<String, GetProjectRootError> {
                     .trim_end()
                     .to_string())
             } else {
-                Err(GetProjectRootError::DotGitNotFound)
+                Err(GetProjectRootFailed::DotGitNotFound)
             }
         }
-        Err(_) => Err(GetProjectRootError::GitCommandNotFound),
+        Err(_) => Err(GetProjectRootFailed::GitCommandNotFound),
     }
 }
 
 fn jump_to_project_root() {
     match get_project_root_path() {
         Ok(path_string) => jump(Path::new(&path_string)),
-        Err(GetProjectRootError::DotGitNotFound) => {
+        Err(GetProjectRootFailed::DotGitNotFound) => {
             print_error(".git directory not found.");
         }
-        Err(GetProjectRootError::GitCommandNotFound) => {
+        Err(GetProjectRootFailed::GitCommandNotFound) => {
             print_error("Command 'git' not found.");
         }
     }
 }
 
-fn jump(dest_dir: &Path) {
-    println!("{}", dest_dir.to_str().unwrap());
+fn jump(to: &Path) {
+    println!("{}", to.to_str().unwrap());
 }
