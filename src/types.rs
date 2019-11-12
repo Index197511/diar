@@ -1,18 +1,14 @@
-pub type Favorite = (String, String);
+use std::path::Path;
+
+pub type Key = String;
+pub type Favorite = (Key, String);
 
 pub enum JumpTo {
-    Key(String),
+    Key(Key),
     ProjectRoot,
 }
 
-pub enum GetProjectRootError {
-    GitCommandNotFound,
-    DotGitNotFound,
-}
-
-pub enum CommandName {
-    Added(Favorite),
-    Deleted(Favorite),
-    Cleared,
-    Renamed(String, String),
+pub enum WhereToAdd<'a> {
+    Path(&'a Path),
+    CurrentDirectory,
 }

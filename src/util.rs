@@ -1,35 +1,13 @@
-extern crate colored;
 extern crate sled;
 
-use colored::Colorize;
-
-use std::fmt::Display;
-
+use super::types::Favorite;
+use sled::Db;
 use dirs::home_dir;
 
-use super::types::{CommandName, Favorite};
-
-pub fn print_result<T, E: Display>(result: Result<T, E>, command_name: CommandName) {
-    match result {
-        Ok(_) => match command_name {
-            CommandName::Added((key, path)) => {
-                println!("{} {} -> {}", "added:".bold().bright_green(), key, path)
-            }
-            CommandName::Deleted((key, path)) => {
-                println!("{} {} -> {}", "deleted:".bold().bright_green(), key, path)
-            }
-            CommandName::Cleared => println!("{}", "cleared".bold().bright_green()),
-            CommandName::Renamed(o_key, n_key) => {
-                println!("{} {} -> {}", "rename:".bold().bright_green(), o_key, n_key)
-            }
-        },
-        Err(e) => println!("{}", e),
-    }
-}
-
-pub fn get_favorites(iter_db: sled::Iter<'_>) -> Vec<Favorite> {
+pub fn get_favorites(db: Db) -> Vec<Favorite> {
     let mut favorites: Vec<Favorite> = Vec::new();
-    let favorites_utf8 = iter_db
+    let favorites_utf8 = db
+        .iter()
         .filter(|maybe_favorite| maybe_favorite.is_ok())
         .map(|ok_favorite| ok_favorite.unwrap());
 
@@ -52,21 +30,14 @@ fn from_utf8s(favorite_ivec: (sled::IVec, sled::IVec)) -> Option<Favorite> {
     }
 }
 
-pub fn suggest(input: &str, searched: Vec<Favorite>) {
-    println!(
-        "{} Key '{}' not found.\n",
-        "error:".bold().bright_red(),
-        input
-    );
-    println!("Is this what you are looking for?");
-    for (key, path) in searched {
+pub fn print_favorites(favorites: Vec<Favorite>) {
+    for (key, path) in favorites {
         println!("       {} -> {}", key, path);
     }
 }
 
-pub fn search(searched_word: &str, db: sled::Db) -> Vec<Favorite> {
-    let iter_db = db.iter();
-    let favorites = get_favorites(iter_db);
+pub fn search(searched_word: &str, db: Db) -> Vec<Favorite> {
+    let favorites = get_favorites(db);
 
     favorites
         .into_iter()
