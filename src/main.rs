@@ -3,8 +3,11 @@ extern crate sled;
 
 use clap::ArgMatches;
 use clap::{App, Arg, SubCommand};
-use diar::types::JumpTo;
-use dirs::home_dir;
+use diar::util::generate_path_string;
+use std::fs;
+use diar::command::{Command, to_command};
+use diar::types::{JumpTo, WhereToAdd};
+use sled::Db;
 use std::path::Path;
 
 mod add;
@@ -16,8 +19,13 @@ mod ls;
 mod rename;
 
 fn main() {
-    let users_db = format!("{}{}", home_dir().unwrap().to_str().unwrap(), "/.dir");
-    let db_path = Path::new(&users_db);
+    let users_db_path = generate_path_string("/.diar".to_owned());
+    let db_path = Path::new(&users_db_path);
+    let _ = fs::rename(
+        Path::new(&generate_path_string("/.dir".to_owned())),
+        db_path,
+    );
+    let db = Db::open(&db_path).unwrap();
     let app = App::new("diar")
         .version("2.2.0")
         .author("Index197511 and 4afS")
@@ -96,54 +104,55 @@ fn main() {
     let matches = app.get_matches();
 
     match matches.subcommand_name() {
-        Some(subcommand_name) => match subcommand_name {
-            "add" => {
+        Some(subcommand_name) => match to_command(subcommand_name) {
+            Some(Command::Add) => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
                     match matches.get_value(subcommand_name, "path") {
-                        Some(path_to_directory) => {
-                            add::add_favorite(Some(Path::new(&path_to_directory)), key, db_path)
+                        Some(given_path) => {
+                            add::add_favorite(db, key, WhereToAdd::Path(Path::new(&given_path)))
                         }
-                        None => add::add_favorite(None, key, db_path),
+                        None => add::add_favorite(db, key, WhereToAdd::CurrentDirectory),
                     }
                 }
             }
 
-            "delete" => {
+            Some(Command::Delete) => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    delete::delete_from_db(key, db_path);
+                    delete::delete_from_db(db, key);
                 }
             }
 
-            "rename" => {
+            Some(Command::Rename) => {
                 if let Some(old_key) = matches.get_value(subcommand_name, "old_key") {
                     if let Some(new_key) = matches.get_value(subcommand_name, "new_key") {
-                        rename::rename_favorite(old_key, new_key, db_path);
+                        rename::rename_favorite(db, old_key, new_key);
                     }
                 }
             }
 
-            "list" => list::list_favorites(db_path),
+            Some(Command::List) => list::list_favorites(db),
 
-            "jump" => {
+            Some(Command::Jump) => {
                 if let Some(subcommand_matches) = matches.subcommand_matches(subcommand_name) {
                     if subcommand_matches.is_present("project-root") {
-                        jump::jump_to(JumpTo::ProjectRoot, db_path);
+                        jump::jump_to(db, JumpTo::ProjectRoot);
                     } else {
                         if let Some(key) = matches.get_value(subcommand_name, "key") {
-                            jump::jump_to(JumpTo::Key(key), db_path);
+                            jump::jump_to(db, JumpTo::Key(key));
                         }
                     }
                 }
             }
-            "clear" => clear::clear_db(db_path),
-            "ls" => {
+
+            Some(Command::Clear) => clear::clear_db(db),
+
+            Some(Command::Ls) => {
                 if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    ls::ls_favorite(key, db_path);
+                    ls::ls_at_favorite(db, key);
                 }
             }
-            _ => {
-                println!();
-            }
+
+            None => (),
         },
 
         None => {

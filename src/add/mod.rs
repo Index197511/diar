@@ -3,45 +3,43 @@ use std::env;
 use std::fs;
 use std::path::Path;
 
-use diar::types::CommandName;
-use diar::util::print_result;
+use diar::command::{CommandResult, print_result};
+use diar::error::error;
+use diar::types::{WhereToAdd, Key};
 
-pub fn add_favorite(maybe_path_given: Option<&Path>, key: String, db_path: &Path) {
-    let db = Db::open(db_path).unwrap();
+pub fn add_favorite(db: Db, key: Key, path: WhereToAdd) {
     match db.get(&key) {
         Ok(Some(_)) => {
-            println!("already exist!");
+            error("This path already exist!");
         }
-        _ => match maybe_path_given {
-            Some(path) => {
-                if path.exists() {
-                    add_path_to_db(fs::canonicalize(path).unwrap().as_path(), key, db);
-                } else {
-                    println!("This path does not exist!: {}", path.to_str().unwrap());
-                }
-            }
-            None => {
-                add_current_path_to_db(key, db);
-            }
+        _ => match path {
+            WhereToAdd::Path(path) => add_given_path_to_db(db, key, path),
+            WhereToAdd::CurrentDirectory => add_current_path_to_db(db, key),
         },
     }
 }
 
-fn add_path_to_db(path: &Path, key: String, db: sled::Db) {
+fn add_path_to_db(db: Db, key: Key, path: &Path) {
     print_result(
         db.insert(&key, path.to_str().unwrap().as_bytes().to_vec()),
-        CommandName::Added((key, path.to_str().unwrap().to_owned())),
+        CommandResult::Added(key, path.to_str().unwrap().to_owned()),
     );
 }
 
-fn add_current_path_to_db(key: String, db: sled::Db) {
+fn add_given_path_to_db(db: Db, key: Key, path: &Path) {
+    if path.exists() {
+        add_path_to_db(db, key, fs::canonicalize(path).unwrap().as_path());
+    } else {
+        error(&format!(
+            "This path does not exist: {}",
+            path.to_str().unwrap()
+        ));
+    }
+}
+
+fn add_current_path_to_db(db: Db, key: Key) {
     match env::current_dir() {
-        Ok(current_path) => {
-            print_result(
-                db.insert(&key, current_path.to_str().unwrap().as_bytes().to_vec()),
-                CommandName::Added((key, current_path.to_str().unwrap().to_owned())),
-            );
-        }
+        Ok(current_path) => add_path_to_db(db, key, &current_path),
         Err(e) => println!("{}", e),
     }
 }

@@ -1,21 +1,19 @@
 use sled::Db;
-use std::path::Path;
 
-use diar::types::CommandName;
-use diar::util::print_result;
+use diar::command::{print_result, CommandResult};
+use diar::error::error;
 
-pub fn rename_favorite(old_key: String, new_key: String, db_path: &Path) {
-    let db = Db::open(db_path).unwrap();
+pub fn rename_favorite(db: Db, old_key: String, new_key: String) {
     match db.get(&old_key) {
         Ok(Some(path)) => {
-            db.remove(&old_key).unwrap();
             print_result(
-                db.insert(&new_key, path.to_vec()),
-                CommandName::Renamed(old_key, new_key),
+                db.remove(&old_key)
+                    .and_then(|_| db.insert(&new_key, path.to_vec())),
+                CommandResult::Renamed(old_key, new_key),
             );
         }
         _ => {
-            println!("This key does not exist: {}", old_key);
+            error(&format!("This key does not exist: {}", old_key));
         }
     }
 }

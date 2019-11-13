@@ -54,7 +54,7 @@ A directory favorite tool in Rust.
   diar-jump(){
     local result=$(diar jump $1)
     if [ -n "$result" ]; then
-      if echo "$result" | grep -e "^Error:" > /dev/null || [ "$1" = "-h" ]; then
+      if echo "$result" | grep -e "error:" > /dev/null || [ "$1" = "-h" ]; then
         echo -e "$result"
       else
         \cd $result
