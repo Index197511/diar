@@ -3,11 +3,11 @@ extern crate sled;
 
 use clap::ArgMatches;
 use clap::{App, Arg, SubCommand};
-use diar::util::generate_path_string;
-use std::fs;
-use diar::command::{Command, to_command};
+use diar::command::{to_command, Command};
 use diar::types::{JumpTo, WhereToAdd};
+use diar::util::generate_path_string;
 use sled::Db;
+use std::fs;
 use std::path::Path;
 
 mod add;
