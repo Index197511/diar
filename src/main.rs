@@ -7,8 +7,9 @@ use diar::command::{to_command, Command};
 use diar::types::{JumpTo, WhereToAdd};
 use diar::util::generate_path_string;
 use sled::Db;
-use std::path::Path;
 use std::fs;
+use std::path::Path;
+use colored::Colorize;
 
 mod add;
 mod clear;
@@ -184,10 +185,11 @@ fn rename_diar_directory() {
             match &*user_ans {
                 "y" => {
                     let _ = fs::rename(Path::new(&changed_db_path), Path::new(&users_db_path));
+                    println!("{} .dir -> .diar", "rename:".bold().bright_green());
                     break;
                 }
                 "n" => {
-                    println!("create new .diar directory");
+                    println!("{} new .diar directory", "generate:".bold().bright_green());
                     break;
                 }
                 _ => {
@@ -195,7 +197,7 @@ fn rename_diar_directory() {
                 }
             }
         }
-
+        println!();
     }
 }
 
@@ -204,4 +206,3 @@ fn read<T: std::str::FromStr>() -> T {
     std::io::stdin().read_line(&mut s).ok();
     s.trim().parse().ok().unwrap()
 }
-
