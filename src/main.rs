@@ -3,12 +3,12 @@ extern crate sled;
 
 use clap::ArgMatches;
 use clap::{App, Arg, SubCommand};
-use diar::util::generate_path_string;
-use std::fs;
-use diar::command::{Command, to_command};
+use diar::command::{to_command, Command};
 use diar::types::{JumpTo, WhereToAdd};
+use diar::util::generate_path_string;
 use sled::Db;
 use std::path::Path;
+use std::fs;
 
 mod add;
 mod clear;
@@ -21,10 +21,7 @@ mod rename;
 fn main() {
     let users_db_path = generate_path_string("/.diar".to_owned());
     let db_path = Path::new(&users_db_path);
-    let _ = fs::rename(
-        Path::new(&generate_path_string("/.dir".to_owned())),
-        db_path,
-    );
+    rename_diar_directory();
     let db = Db::open(&db_path).unwrap();
     let app = App::new("diar")
         .version("2.2.0")
@@ -172,3 +169,39 @@ impl GetFromArg for ArgMatches<'_> {
             .map(|name| name.to_string())
     }
 }
+
+fn rename_diar_directory() {
+    let users_db_path = generate_path_string("/.diar".to_owned());
+    let changed_db_path = generate_path_string("/.dir".to_owned());
+    if !Path::new(&users_db_path).exists() && Path::new(&changed_db_path).exists() {
+        println!("This tool requires a .diar directory.");
+        println!("Since it was a .dir directory in the previous version,");
+        println!("I am trying to replace your .dir directory with a .diar directory.");
+        println!("Please type y or n");
+
+        loop {
+            let user_ans: String = read();
+            match &*user_ans {
+                "y" => {
+                    let _ = fs::rename(Path::new(&changed_db_path), Path::new(&users_db_path));
+                    break;
+                }
+                "n" => {
+                    println!("create new .diar directory");
+                    break;
+                }
+                _ => {
+                    println!("Please type y or n");
+                }
+            }
+        }
+
+    }
+}
+
+fn read<T: std::str::FromStr>() -> T {
+    let mut s = String::new();
+    std::io::stdin().read_line(&mut s).ok();
+    s.trim().parse().ok().unwrap()
+}
+

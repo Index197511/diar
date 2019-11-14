@@ -1,8 +1,8 @@
 extern crate colored;
 
-use colored::Colorize;
 use super::types::Favorite;
 use super::util::print_favorites;
+use colored::Colorize;
 
 pub enum GetProjectRootFailed {
     GitCommandNotFound,
@@ -18,4 +18,3 @@ pub fn suggest(input: &str, searched: Vec<Favorite>) {
     println!("Is this what you are looking for?");
     print_favorites(searched)
 }
-

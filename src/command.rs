@@ -1,8 +1,8 @@
 extern crate colored;
 
+use super::types::Key;
 use colored::Colorize;
 use std::fmt::Display;
-use super::types::Key;
 
 pub enum Command {
     Add,

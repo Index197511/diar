@@ -1,8 +1,10 @@
 extern crate sled;
 
 use super::types::Favorite;
-use sled::Db;
 use dirs::home_dir;
+use sled::Db;
+use std::fs;
+use std::path::Path;
 
 pub fn get_favorites(db: Db) -> Vec<Favorite> {
     let mut favorites: Vec<Favorite> = Vec::new();
@@ -48,3 +50,4 @@ pub fn search(searched_word: &str, db: Db) -> Vec<Favorite> {
 pub fn generate_path_string(s: String) -> String {
     format!("{}{}", home_dir().unwrap().to_str().unwrap(), s)
 }
+

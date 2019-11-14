@@ -1,6 +1,6 @@
 use sled::Db;
 
-use diar::command::{CommandResult, print_result};
+use diar::command::{print_result, CommandResult};
 use diar::error::error;
 
 pub fn delete_from_db(db: Db, key: String) {
