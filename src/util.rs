@@ -1,8 +1,8 @@
 extern crate sled;
 
 use super::types::Favorite;
-use sled::Db;
 use dirs::home_dir;
+use sled::Db;
 
 pub fn get_favorites(db: Db) -> Vec<Favorite> {
     let mut favorites: Vec<Favorite> = Vec::new();

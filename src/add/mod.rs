@@ -3,9 +3,9 @@ use std::env;
 use std::fs;
 use std::path::Path;
 
-use diar::command::{CommandResult, print_result};
+use diar::command::{print_result, CommandResult};
 use diar::error::error;
-use diar::types::{WhereToAdd, Key};
+use diar::types::{Key, WhereToAdd};
 
 pub fn add_favorite(db: Db, key: Key, path: WhereToAdd) {
     match db.get(&key) {
