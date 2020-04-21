@@ -85,7 +85,12 @@ fn main() {
                         .help("The current project root directory")
                         .long("project-root")
                         .short("p"),
-                ),
+                )
+                .arg(
+                    Arg::with_name("fzf")
+                        .help("fuzzy finder")
+                        .short("f")
+                    )
         )
         .subcommand(SubCommand::with_name("clear").about("Delete all favorite directories."))
         .subcommand(
@@ -134,10 +139,12 @@ fn main() {
                 if let Some(subcommand_matches) = matches.subcommand_matches(subcommand_name) {
                     if subcommand_matches.is_present("project-root") {
                         jump::jump_to(db, JumpTo::ProjectRoot);
-                    } else {
+                    } else if subcommand_matches.is_present("key"){
                         if let Some(key) = matches.get_value(subcommand_name, "key") {
                             jump::jump_to(db, JumpTo::Key(key));
                         }
+                    } else if subcommand_matches.is_present("fzf"){
+                        jump::jump_to(db, JumpTo::Fzf);
                     }
                 }
             }
