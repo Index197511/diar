@@ -25,7 +25,7 @@ fn main() {
     rename_diar_directory();
     let db = Db::open(&db_path).unwrap();
     let app = App::new("diar")
-        .version("2.2.0")
+        .version("2.3.0")
         .author("Index197511 and 4afS")
         .about("A directory favorite tool in Rust.")
         .subcommand(
