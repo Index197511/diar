@@ -13,11 +13,11 @@ pub fn jump_to(db: Db, to: JumpTo) {
     match to {
         JumpTo::Key(key) => jump_to_key(db, &key),
         JumpTo::ProjectRoot => jump_to_project_root(),
-        JumpTo::Fzf => jump_with_fzf(db),
+        JumpTo::FuzzyFinder => jump_with_skim(db),
     }
 }
 
-fn jump_with_fzf(db: Db) {
+fn jump_with_skim(db: Db) {
     let skim_option = SkimOptionsBuilder::default()
         .height(Some("30%"))
         .multi(true)

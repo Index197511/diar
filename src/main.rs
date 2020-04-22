@@ -87,7 +87,7 @@ fn main() {
                         .short("p"),
                 )
                 .arg(
-                    Arg::with_name("fzf")
+                    Arg::with_name("fuzzy-finder")
                         .help("fuzzy finder")
                         .short("f")
                     )
@@ -143,8 +143,8 @@ fn main() {
                         if let Some(key) = matches.get_value(subcommand_name, "key") {
                             jump::jump_to(db, JumpTo::Key(key));
                         }
-                    } else if subcommand_matches.is_present("fzf"){
-                        jump::jump_to(db, JumpTo::Fzf);
+                    } else if subcommand_matches.is_present("fuzzy-finder"){
+                        jump::jump_to(db, JumpTo::FuzzyFinder);
                     }
                 }
             }

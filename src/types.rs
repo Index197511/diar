@@ -6,7 +6,7 @@ pub type Favorite = (Key, String);
 pub enum JumpTo {
     Key(Key),
     ProjectRoot,
-    Fzf
+    FuzzyFinder
 }
 
 pub enum WhereToAdd<'a> {
