@@ -25,7 +25,7 @@ fn main() {
     rename_diar_directory();
     let db = Db::open(&db_path).unwrap();
     let app = App::new("diar")
-        .version("2.2.0")
+        .version("2.3.0")
         .author("Index197511 and 4afS")
         .about("A directory favorite tool in Rust.")
         .subcommand(
@@ -85,7 +85,12 @@ fn main() {
                         .help("The current project root directory")
                         .long("project-root")
                         .short("p"),
-                ),
+                )
+                .arg(
+                    Arg::with_name("fuzzy-finder")
+                        .help("fuzzy finder")
+                        .short("f")
+                    )
         )
         .subcommand(SubCommand::with_name("clear").about("Delete all favorite directories."))
         .subcommand(
@@ -134,10 +139,12 @@ fn main() {
                 if let Some(subcommand_matches) = matches.subcommand_matches(subcommand_name) {
                     if subcommand_matches.is_present("project-root") {
                         jump::jump_to(db, JumpTo::ProjectRoot);
-                    } else {
+                    } else if subcommand_matches.is_present("key"){
                         if let Some(key) = matches.get_value(subcommand_name, "key") {
                             jump::jump_to(db, JumpTo::Key(key));
                         }
+                    } else if subcommand_matches.is_present("fuzzy-finder"){
+                        jump::jump_to(db, JumpTo::FuzzyFinder);
                     }
                 }
             }

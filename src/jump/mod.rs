@@ -1,7 +1,11 @@
+extern crate skim;
+
 use diar::error::{error, suggest, GetProjectRootFailed};
 use diar::types::JumpTo;
-use diar::util::search;
+use diar::util::{get_favorites, search};
+use skim::prelude::*;
 use sled::Db;
+use std::io::Cursor;
 use std::path::Path;
 use std::process::Command;
 
@@ -9,6 +13,38 @@ pub fn jump_to(db: Db, to: JumpTo) {
     match to {
         JumpTo::Key(key) => jump_to_key(db, &key),
         JumpTo::ProjectRoot => jump_to_project_root(),
+        JumpTo::FuzzyFinder => jump_with_skim(db),
+    }
+}
+
+fn jump_with_skim(db: Db) {
+    let skim_option = SkimOptionsBuilder::default()
+        .height(Some("30%"))
+        .multi(true)
+        .build()
+        .unwrap();
+
+    let item_reader = SkimItemReader::default();
+    let favorites = get_favorites(db)
+        .iter()
+        .map(|(key, path)| format!("{} -> {}", key, path))
+        .collect::<Vec<String>>();
+    let items = item_reader.of_bufread(Cursor::new(favorites.join("\n")));
+
+    let selected_items = Skim::run_with(&skim_option, Some(items))
+        .map(|out| out.selected_items)
+        .unwrap_or_else(|| Vec::new());
+
+    for item in selected_items {
+        println!(
+            "{}",
+            item.output()
+                .into_owned()
+                .split(" -> ")
+                .collect::<Vec<&str>>()
+                .pop()
+                .unwrap()
+        );
     }
 }
 
