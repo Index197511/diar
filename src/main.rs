@@ -3,13 +3,13 @@ extern crate sled;
 
 use clap::ArgMatches;
 use clap::{App, Arg, SubCommand};
+use colored::Colorize;
 use diar::command::{to_command, Command};
 use diar::types::{JumpTo, WhereToAdd};
 use diar::util::generate_path_string;
 use sled::Db;
 use std::fs;
 use std::path::Path;
-use colored::Colorize;
 
 mod add;
 mod clear;
@@ -89,8 +89,8 @@ fn main() {
                 .arg(
                     Arg::with_name("fuzzy-finder")
                         .help("fuzzy finder")
-                        .short("f")
-                    )
+                        .short("f"),
+                ),
         )
         .subcommand(SubCommand::with_name("clear").about("Delete all favorite directories."))
         .subcommand(
@@ -139,11 +139,11 @@ fn main() {
                 if let Some(subcommand_matches) = matches.subcommand_matches(subcommand_name) {
                     if subcommand_matches.is_present("project-root") {
                         jump::jump_to(db, JumpTo::ProjectRoot);
-                    } else if subcommand_matches.is_present("key"){
+                    } else if subcommand_matches.is_present("key") {
                         if let Some(key) = matches.get_value(subcommand_name, "key") {
                             jump::jump_to(db, JumpTo::Key(key));
                         }
-                    } else if subcommand_matches.is_present("fuzzy-finder"){
+                    } else if subcommand_matches.is_present("fuzzy-finder") {
                         jump::jump_to(db, JumpTo::FuzzyFinder);
                     }
                 }
