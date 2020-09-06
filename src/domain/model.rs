@@ -1,16 +1,11 @@
 use super::entity;
 use std::path::Path;
+use derive_getters::{Getters};
+use derive_new::new;
 
+
+#[derive(new, Getters)]
 pub struct Favorite<'a> {
-    pub name: entity::Name<'a>,
-    pub path: &'a Path,
-}
-
-impl<'a> Favorite<'a> {
-    pub fn new(name: &'a str, path: &'a Path) -> Self {
-        Favorite {
-            name: name,
-            path: path,
-        }
-    }
+    name: entity::Name<'a>,
+    path: &'a Path,
 }
