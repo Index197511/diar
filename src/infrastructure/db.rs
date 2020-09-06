@@ -1,6 +1,6 @@
+use derive_getters::Getters;
 use dirs::home_dir;
 use std::path::Path;
-use derive_getters::{Getters};
 
 #[derive(Getters)]
 pub struct DbHandler {

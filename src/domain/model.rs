@@ -1,8 +1,7 @@
 use super::entity;
-use std::path::Path;
-use derive_getters::{Getters};
+use derive_getters::Getters;
 use derive_new::new;
-
+use std::path::Path;
 
 #[derive(new, Getters)]
 pub struct Favorite<'a> {

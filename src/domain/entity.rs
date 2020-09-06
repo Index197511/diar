@@ -1,4 +1,3 @@
-// pub type Name<'a> = &'a str;
 #[macro_use]
 use derive_new::new;
 
