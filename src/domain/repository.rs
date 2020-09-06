@@ -1,7 +1,7 @@
 use super::model::Favorite;
 use super::entity::Name;
 
-pub trait Repository {
+pub trait IRepository {
   type Error;
   fn add(&self, favorite: Favorite) -> DbResponse<(), Self::Error>;
   fn get_all(&self) -> DbResponse<Vec<Favorite>, Self::Error>;
