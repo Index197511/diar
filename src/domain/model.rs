@@ -6,6 +6,6 @@ use derive_new::new;
 
 #[derive(new, Getters)]
 pub struct Favorite<'a> {
-    name: entity::Name<'a>,
+    name: &'a entity::Name<'a>,
     path: &'a Path,
 }
