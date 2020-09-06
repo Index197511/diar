@@ -1,2 +1,2 @@
-pub mod db_handler;
+pub mod repository;
 pub mod db;
