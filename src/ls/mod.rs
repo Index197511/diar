@@ -1,5 +1,5 @@
-use diar::error::suggest;
-use diar::util::search;
+use crate::error::suggest;
+use crate::util::search;
 use sled::Db;
 use std::fs;
 

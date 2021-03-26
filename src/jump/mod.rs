@@ -1,8 +1,8 @@
 extern crate skim;
 
-use diar::error::{error, suggest, GetProjectRootFailed};
-use diar::types::JumpTo;
-use diar::util::{get_favorites, search};
+use crate::error::{error, suggest, GetProjectRootFailed};
+use crate::types::JumpTo;
+use crate::util::{get_favorites, search};
 use skim::prelude::*;
 use sled::Db;
 use std::io::Cursor;

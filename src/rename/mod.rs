@@ -1,7 +1,7 @@
 use sled::Db;
 
-use diar::command::{print_result, CommandResult};
-use diar::error::error;
+use crate::command::{print_result, CommandResult};
+use crate::error::error;
 
 pub fn rename_favorite(db: Db, old_key: String, new_key: String) {
     match db.get(&old_key) {
