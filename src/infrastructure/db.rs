@@ -1,11 +1,7 @@
-use derive_getters::Getters;
 use dirs::home_dir;
 use std::path::Path;
 
-#[derive(Getters)]
-pub struct DbHandler {
-    db: sled::Db,
-}
+pub struct DbHandler(pub sled::Db);
 
 impl DbHandler {
     pub fn new(dir: &str) -> Result<Self, sled::Error> {
@@ -14,13 +10,11 @@ impl DbHandler {
                 std::io::ErrorKind::NotFound,
                 "cannot found home directory",
             ))),
-            Some(path) => sled::Db::open(Path::new(&path)).and_then(|db| Ok(DbHandler { db: db })),
+            Some(path) => sled::open(Path::new(&path)).map(DbHandler),
         }
     }
 }
 
 fn to_abs_path(dir: &str) -> Option<String> {
-    home_dir()
-        .and_then(|pathbuf| pathbuf.to_str())
-        .and_then(|path| format!("{}/{}", path, dir))
+    Some(format!("{}/{}", home_dir()?.to_str()?, dir))
 }
