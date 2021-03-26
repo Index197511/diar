@@ -1,6 +1,3 @@
-extern crate clap;
-extern crate sled;
-
 use clap::App;
 use clap::ArgMatches;
 use colored::Colorize;
