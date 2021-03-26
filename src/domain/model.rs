@@ -1,10 +1,10 @@
-use super::entity;
-use derive_getters::Getters;
 use derive_new::new;
-use std::path::Path;
+use getset::Getters;
 
 #[derive(new, Getters)]
-pub struct Favorite<'a> {
-    name: &'a entity::Name<'a>,
-    path: &'a Path,
+pub struct Favorite {
+    #[getset(get = "pub")]
+    name: String,
+    #[getset(get = "pub")]
+    path: String,
 }
