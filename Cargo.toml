@@ -20,3 +20,6 @@ derive_more = "0.99.13"
 getset = "0.1.1"
 thiserror = "1.0.24"
 anyhow = "1.0.40"
+strum_macros = "0.20"
+strum = { version = "0.20", features = ["derive"] }
+
