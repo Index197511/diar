@@ -1,10 +1,7 @@
 use std::path::Path;
 
-pub type Key = String;
-pub type Favorite = (Key, String);
-
 pub enum JumpTo {
-    Key(Key),
+    Key(String),
     ProjectRoot,
     FuzzyFinder,
 }

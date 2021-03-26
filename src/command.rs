@@ -1,6 +1,5 @@
 extern crate colored;
 
-use super::types::Key;
 use colored::Colorize;
 use std::fmt::Display;
 
@@ -15,23 +14,10 @@ pub enum Command {
 }
 
 pub enum CommandResult {
-    Added(Key, String),
-    Deleted(Key, String),
+    Added(String, String),
+    Deleted(String, String),
     Cleared,
-    Renamed(Key, Key),
-}
-
-pub fn to_command(command: &str) -> Option<Command> {
-    match command {
-        "add" => Some(Command::Add),
-        "delete" => Some(Command::Delete),
-        "rename" => Some(Command::Rename),
-        "list" => Some(Command::List),
-        "jump" => Some(Command::Jump),
-        "clear" => Some(Command::Clear),
-        "ls" => Some(Command::Ls),
-        _ => None,
-    }
+    Renamed(String, String),
 }
 
 pub fn print_result<T, E: Display>(result: Result<T, E>, command_name: CommandResult) {

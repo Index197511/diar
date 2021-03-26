@@ -27,13 +27,13 @@ fn jump_with_skim(db: Db) {
     let item_reader = SkimItemReader::default();
     let favorites = get_favorites(db)
         .iter()
-        .map(|(key, path)| format!("{} -> {}", key, path))
+        .map(|favorite| format!("{} -> {}", favorite.name(), favorite.path()))
         .collect::<Vec<String>>();
     let items = item_reader.of_bufread(Cursor::new(favorites.join("\n")));
 
     let selected_items = Skim::run_with(&skim_option, Some(items))
         .map(|out| out.selected_items)
-        .unwrap_or_else(|| Vec::new());
+        .unwrap_or_else(Vec::new);
 
     for item in selected_items {
         println!(

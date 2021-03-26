@@ -1,7 +1,7 @@
 extern crate colored;
 
-use super::types::Favorite;
 use super::util::print_favorites;
+use crate::domain::model::Favorite;
 use colored::Colorize;
 
 pub enum GetProjectRootFailed {
