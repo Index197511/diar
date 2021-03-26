@@ -1,9 +1,10 @@
 extern crate clap;
 extern crate sled;
 
+use clap::App;
 use clap::ArgMatches;
-use clap::{App, Arg, SubCommand};
 use colored::Colorize;
+use diar::command::command;
 use diar::domain::model::Command;
 use diar::types::{JumpTo, WhereToAdd};
 use diar::util::generate_path_string;
@@ -27,108 +28,42 @@ fn main() {
         .version("2.3.0")
         .author("Index197511 and 4afS")
         .about("A directory favorite tool in Rust.")
-        .subcommand(
-            SubCommand::with_name("add")
-                .about("Add a directory you like to favorite")
-                .arg(
-                    Arg::with_name("path")
-                        .help("absolute path")
-                        .short("p")
-                        .long("path")
-                        .takes_value(true),
-                )
-                .arg(
-                    Arg::with_name("key")
-                        .help("key to directory")
-                        .takes_value(true)
-                        .required(true),
-                ),
-        )
-        .subcommand(
-            SubCommand::with_name("delete")
-                .about("Delete a directory from favorite")
-                .arg(
-                    Arg::with_name("key")
-                        .help("named directory")
-                        .takes_value(true)
-                        .required(true),
-                ),
-        )
-        .subcommand(
-            SubCommand::with_name("rename")
-                .about("Rename favorite directory")
-                .arg(
-                    Arg::with_name("old_key")
-                        .help("old key to favorite directory")
-                        .takes_value(true)
-                        .required(true),
-                )
-                .arg(
-                    Arg::with_name("new_key")
-                        .help("new key to favorite directory")
-                        .takes_value(true)
-                        .required(true),
-                ),
-        )
-        .subcommand(SubCommand::with_name("list").about("List favorite directories"))
-        .subcommand(
-            SubCommand::with_name("jump")
-                .about("Jump to your favorite directory or root directory of the project")
-                .arg(
-                    Arg::with_name("key")
-                        .help("favorite dirs key")
-                        .takes_value(true),
-                )
-                .arg(
-                    Arg::with_name("project-root")
-                        .help("The current project root directory")
-                        .long("project-root")
-                        .short("p"),
-                )
-                .arg(
-                    Arg::with_name("fuzzy-finder")
-                        .help("fuzzy finder")
-                        .short("f"),
-                ),
-        )
-        .subcommand(SubCommand::with_name("clear").about("Delete all favorite directories."))
-        .subcommand(
-            SubCommand::with_name("ls")
-                .about("ls your favorite directory")
-                .arg(
-                    Arg::with_name("key")
-                        .help("favorite dir's key")
-                        .takes_value(true)
-                        .required(true),
-                ),
-        );
+        .subcommand(command(Command::Add))
+        .subcommand(command(Command::Delete))
+        .subcommand(command(Command::Rename))
+        .subcommand(command(Command::List))
+        .subcommand(command(Command::Jump))
+        .subcommand(command(Command::Clear))
+        .subcommand(command(Command::Ls));
 
     let matches = app.get_matches();
-
     match matches.subcommand_name() {
         Some(subcommand_name) => match Command::from_str(subcommand_name) {
             Ok(Command::Add) => {
-                if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    match matches.get_value(subcommand_name, "path") {
-                        Some(given_path) => {
-                            add::add_favorite(db, key, WhereToAdd::Path(Path::new(&given_path)))
-                        }
-                        None => add::add_favorite(db, key, WhereToAdd::CurrentDirectory),
+                match (
+                    matches.get_value(subcommand_name, "key"),
+                    matches.get_value(subcommand_name, "path"),
+                ) {
+                    (Some(key), Some(path)) => {
+                        add::add_favorite(db, key, WhereToAdd::Path(Path::new(&path)))
                     }
+                    (Some(key), None) => add::add_favorite(db, key, WhereToAdd::CurrentDirectory),
+                    _ => guide_to_help(),
                 }
             }
 
-            Ok(Command::Delete) => {
-                if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    delete::delete_from_db(db, key);
-                }
-            }
+            Ok(Command::Delete) => match matches.get_value(subcommand_name, "key") {
+                Some(key) => delete::delete_from_db(db, key),
+                _ => guide_to_help(),
+            },
 
             Ok(Command::Rename) => {
-                if let Some(old_key) = matches.get_value(subcommand_name, "old_key") {
-                    if let Some(new_key) = matches.get_value(subcommand_name, "new_key") {
-                        rename::rename_favorite(db, old_key, new_key);
-                    }
+                match (
+                    matches.get_value(subcommand_name, "old_key"),
+                    matches.get_value(subcommand_name, "new_key"),
+                ) {
+                    (Some(old), Some(new)) => rename::rename_favorite(db, old, new),
+                    _ => guide_to_help(),
                 }
             }
 
@@ -138,31 +73,37 @@ fn main() {
                 if let Some(subcommand_matches) = matches.subcommand_matches(subcommand_name) {
                     if subcommand_matches.is_present("project-root") {
                         jump::jump_to(db, JumpTo::ProjectRoot);
-                    } else if subcommand_matches.is_present("key") {
-                        if let Some(key) = matches.get_value(subcommand_name, "key") {
-                            jump::jump_to(db, JumpTo::Key(key));
-                        }
                     } else if subcommand_matches.is_present("fuzzy-finder") {
                         jump::jump_to(db, JumpTo::FuzzyFinder);
+                    } else {
+                        match matches.get_value(subcommand_name, "key") {
+                            Some(key) => jump::jump_to(db, JumpTo::Key(key)),
+                            _ => guide_to_help(),
+                        }
                     }
+                } else {
+                    guide_to_help();
                 }
             }
 
             Ok(Command::Clear) => clear::clear_db(db),
 
-            Ok(Command::Ls) => {
-                if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    ls::ls_at_favorite(db, key);
-                }
-            }
+            Ok(Command::Ls) => match matches.get_value(subcommand_name, "key") {
+                Some(key) => ls::ls_at_favorite(db, key),
+                None => guide_to_help(),
+            },
 
-            Err(_) => (),
+            Err(_) => guide_to_help(),
         },
 
         None => {
-            println!("diar: try 'diar --help' for more information");
+            guide_to_help();
         }
     }
+}
+
+fn guide_to_help() {
+    println!("diar: try 'diar --help' for more information");
 }
 
 trait GetFromArg {
