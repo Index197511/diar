@@ -8,7 +8,7 @@ use diar::util::generate_path_string;
 use std::path::Path;
 use std::{fs, str::FromStr};
 
-use diar::{add, clear, delete, jump, list, ls, rename};
+use diar::commands::{add, clear, delete, jump, list, ls, rename};
 
 fn main() {
     let users_db_path = generate_path_string("/.diar".to_owned());
