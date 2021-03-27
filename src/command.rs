@@ -33,9 +33,9 @@ pub enum CommandResult {
     Renamed(String, String),
 }
 
-pub fn print_result<T>(result: anyhow::Result<T>, command_name: CommandResult) {
+pub fn print_result<T>(result: anyhow::Result<T>, command_result: CommandResult) {
     match result {
-        Ok(_) => match command_name {
+        Ok(_) => match command_result {
             CommandResult::Added(key, path) => {
                 println!("{} {} -> {}", "added:".bold().bright_green(), key, path)
             }
