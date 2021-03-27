@@ -2,7 +2,7 @@ use crate::domain::repository::IRepository;
 use crate::{command::CommandError, domain::model::Favorite};
 
 pub fn rename_favorite<T: IRepository>(
-    repo: T,
+    repo: &T,
     old_key: String,
     new_key: String,
 ) -> anyhow::Result<Favorite> {

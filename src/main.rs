@@ -44,7 +44,7 @@ fn main() {
                     matches.get_value(subcommand_name, "path"),
                 ) {
                     (Some(key), Some(path)) => {
-                        match add::add_favorite(repo, key, WhereToAdd::Path(Path::new(&path))) {
+                        match add::add_favorite(&repo, key, WhereToAdd::Path(Path::new(&path))) {
                             Ok(favorite) => {
                                 print_result(CommandResult::Added(favorite.name(), favorite.path()))
                             }
@@ -52,7 +52,7 @@ fn main() {
                         }
                     }
                     (Some(key), None) => {
-                        match add::add_favorite(repo, key, WhereToAdd::CurrentDirectory) {
+                        match add::add_favorite(&repo, key, WhereToAdd::CurrentDirectory) {
                             Ok(favorite) => {
                                 print_result(CommandResult::Added(favorite.name(), favorite.path()))
                             }
@@ -64,7 +64,7 @@ fn main() {
             }
 
             Ok(Command::Delete) => match matches.get_value(subcommand_name, "key") {
-                Some(key) => match delete::delete_from_db(repo, key) {
+                Some(key) => match delete::delete_from_db(&repo, key) {
                     Ok(favorite) => {
                         print_result(CommandResult::Deleted(favorite.name(), favorite.path()))
                     }
@@ -78,16 +78,19 @@ fn main() {
                     matches.get_value(subcommand_name, "old_key"),
                     matches.get_value(subcommand_name, "new_key"),
                 ) {
-                    (Some(old), Some(new)) => match rename::rename_favorite(repo, old, new.clone())
-                    {
-                        Ok(favorite) => print_result(CommandResult::Renamed(favorite.name(), new)),
-                        Err(e) => presenter::error(&e.to_string()),
-                    },
+                    (Some(old), Some(new)) => {
+                        match rename::rename_favorite(&repo, old, new.clone()) {
+                            Ok(favorite) => {
+                                print_result(CommandResult::Renamed(favorite.name(), new))
+                            }
+                            Err(e) => presenter::error(&e.to_string()),
+                        }
+                    }
                     _ => guide_to_help(),
                 }
             }
 
-            Ok(Command::List) => match list::list_favorites(repo) {
+            Ok(Command::List) => match list::list_favorites(&repo) {
                 Ok(favorites) => print_favorites(favorites),
                 Err(e) => presenter::error(&e.to_string()),
             },
@@ -95,18 +98,18 @@ fn main() {
             Ok(Command::Jump) => {
                 if let Some(subcommand_matches) = matches.subcommand_matches(subcommand_name) {
                     if subcommand_matches.is_present("project-root") {
-                        match jump::jump_to(repo, JumpTo::ProjectRoot) {
+                        match jump::jump_to(&repo, JumpTo::ProjectRoot) {
                             Ok(path) => println!("{}", path),
                             Err(e) => presenter::error(&e.to_string()),
                         };
                     } else if subcommand_matches.is_present("fuzzy-finder") {
-                        match jump::jump_to(repo, JumpTo::FuzzyFinder) {
+                        match jump::jump_to(&repo, JumpTo::FuzzyFinder) {
                             Ok(path) => println!("{}", path),
                             Err(e) => presenter::error(&e.to_string()),
                         };
                     } else {
                         match matches.get_value(subcommand_name, "key") {
-                            Some(key) => match jump::jump_to(repo, JumpTo::Key(key)) {
+                            Some(key) => match jump::jump_to(&repo, JumpTo::Key(key)) {
                                 Ok(path) => println!("{}", path),
                                 Err(e) => presenter::error(&e.to_string()),
                             },
@@ -118,13 +121,13 @@ fn main() {
                 }
             }
 
-            Ok(Command::Clear) => match clear::clear_db(repo) {
+            Ok(Command::Clear) => match clear::clear_db(&repo) {
                 Ok(_) => print_result(CommandResult::Cleared),
                 Err(e) => presenter::error(&e.to_string()),
             },
 
             Ok(Command::Ls) => match matches.get_value(subcommand_name, "key") {
-                Some(key) => match ls::ls_at_favorite(repo, key) {
+                Some(key) => match ls::ls_at_favorite(&repo, key) {
                     Ok(favorite) => presenter::ls(&favorite.path()),
                     Err(e) => presenter::error(&e.to_string()),
                 },

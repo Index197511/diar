@@ -11,7 +11,7 @@ pub enum JumpTo {
     FuzzyFinder,
 }
 
-pub fn jump_to<T: IRepository>(repo: T, to: JumpTo) -> anyhow::Result<String> {
+pub fn jump_to<T: IRepository>(repo: &T, to: JumpTo) -> anyhow::Result<String> {
     match to {
         JumpTo::FuzzyFinder => jump_with_skim(repo).map(|fav| fav.path()),
         JumpTo::Key(key) => jump_to_key(repo, &key).map(|fav| fav.path()),
@@ -19,7 +19,7 @@ pub fn jump_to<T: IRepository>(repo: T, to: JumpTo) -> anyhow::Result<String> {
     }
 }
 
-fn jump_with_skim<T: IRepository>(repo: T) -> anyhow::Result<Favorite> {
+fn jump_with_skim<T: IRepository>(repo: &T) -> anyhow::Result<Favorite> {
     let skim_option = SkimOptionsBuilder::default()
         .height(Some("30%"))
         .multi(true)
@@ -59,7 +59,7 @@ fn jump_with_skim<T: IRepository>(repo: T) -> anyhow::Result<Favorite> {
     }
 }
 
-fn jump_to_key<T: IRepository>(repo: T, key: &str) -> anyhow::Result<Favorite> {
+fn jump_to_key<T: IRepository>(repo: &T, key: &str) -> anyhow::Result<Favorite> {
     let maybe_path_matched = repo.get(key);
 
     match maybe_path_matched {

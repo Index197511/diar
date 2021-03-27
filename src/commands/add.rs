@@ -10,7 +10,7 @@ pub enum WhereToAdd<'a> {
 }
 
 pub fn add_favorite<T: IRepository>(
-    repo: T,
+    repo: &T,
     key: String,
     path: WhereToAdd,
 ) -> anyhow::Result<Favorite> {
@@ -25,7 +25,7 @@ pub fn add_favorite<T: IRepository>(
 }
 
 fn add_given_path_to_db<T: IRepository>(
-    repo: T,
+    repo: &T,
     key: String,
     path: &Path,
 ) -> anyhow::Result<Favorite> {
@@ -45,7 +45,7 @@ fn add_given_path_to_db<T: IRepository>(
     repo.add(&favorite).map(|_| Ok(favorite))?
 }
 
-fn add_current_path_to_db<T: IRepository>(repo: T, key: String) -> anyhow::Result<Favorite> {
+fn add_current_path_to_db<T: IRepository>(repo: &T, key: String) -> anyhow::Result<Favorite> {
     match env::current_dir() {
         Ok(current_path) => {
             let favorite: anyhow::Result<Favorite> = current_path
