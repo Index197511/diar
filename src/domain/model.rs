@@ -1,13 +1,20 @@
 use derive_new::new;
-use getset::Getters;
 use strum_macros::EnumString;
 
-#[derive(new, Getters, Clone)]
+#[derive(new, Clone)]
 pub struct Favorite {
-    #[getset(get = "pub")]
     name: String,
-    #[getset(get = "pub")]
     path: String,
+}
+
+impl Favorite {
+    pub fn name(&self) -> String {
+        self.name.clone()
+    }
+
+    pub fn path(&self) -> String {
+        self.path.clone()
+    }
 }
 
 #[derive(Debug, PartialEq, EnumString)]

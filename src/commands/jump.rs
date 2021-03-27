@@ -13,8 +13,8 @@ pub enum JumpTo {
 
 pub fn jump_to<T: IRepository>(repo: T, to: JumpTo) -> anyhow::Result<String> {
     match to {
-        JumpTo::FuzzyFinder => jump_with_skim(repo).map(|fav| fav.path().to_string()),
-        JumpTo::Key(key) => jump_to_key(repo, &key).map(|fav| fav.path().to_string()),
+        JumpTo::FuzzyFinder => jump_with_skim(repo).map(|fav| fav.path()),
+        JumpTo::Key(key) => jump_to_key(repo, &key).map(|fav| fav.path()),
         JumpTo::ProjectRoot => jump_to_project_root(),
     }
 }
