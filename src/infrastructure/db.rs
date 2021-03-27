@@ -1,4 +1,6 @@
 use dirs::home_dir;
+use sled::Error::Io;
+use std::io::{Error, ErrorKind};
 use std::path::Path;
 
 pub struct DbHandler(pub sled::Db);
@@ -6,8 +8,8 @@ pub struct DbHandler(pub sled::Db);
 impl DbHandler {
     pub fn new(dir: &str) -> Result<Self, sled::Error> {
         match to_abs_path(dir) {
-            None => Err(sled::Error::Io(std::io::Error::new(
-                std::io::ErrorKind::NotFound,
+            None => Err(Io(Error::new(
+                ErrorKind::NotFound,
                 "cannot found home directory",
             ))),
             Some(path) => sled::open(Path::new(&path)).map(DbHandler),
