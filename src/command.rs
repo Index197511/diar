@@ -3,19 +3,7 @@ extern crate colored;
 use crate::domain::model::Command;
 use clap::{App, Arg, SubCommand};
 use derive_more::Display;
-use std::path::Path;
 use thiserror::Error as ThisError;
-
-pub enum JumpTo {
-    Key(String),
-    ProjectRoot,
-    FuzzyFinder,
-}
-
-pub enum WhereToAdd<'a> {
-    Path(&'a Path),
-    CurrentDirectory,
-}
 
 #[derive(Debug, ThisError, Display)]
 pub enum CommandError {
