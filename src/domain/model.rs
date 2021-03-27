@@ -2,7 +2,7 @@ use derive_new::new;
 use getset::Getters;
 use strum_macros::EnumString;
 
-#[derive(new, Getters)]
+#[derive(new, Getters, Clone)]
 pub struct Favorite {
     #[getset(get = "pub")]
     name: String,
