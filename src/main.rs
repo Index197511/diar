@@ -1,10 +1,13 @@
 use clap::App;
 use clap::ArgMatches;
 use colored::Colorize;
-use diar::command::command;
 use diar::domain::model::Command;
 use diar::types::{JumpTo, WhereToAdd};
 use diar::util::generate_path_string;
+use diar::{
+    command::command,
+    infrastructure::{db::DbHandler, repository::Repository},
+};
 use std::path::Path;
 use std::{fs, str::FromStr};
 
@@ -15,6 +18,8 @@ fn main() {
     let db_path = Path::new(&users_db_path);
     rename_diar_directory();
     let db = sled::open(&db_path).unwrap();
+    let repo = Repository(DbHandler(db));
+
     let app = App::new("diar")
         .version("2.3.0")
         .author("Index197511 and 4afS")
@@ -36,15 +41,15 @@ fn main() {
                     matches.get_value(subcommand_name, "path"),
                 ) {
                     (Some(key), Some(path)) => {
-                        add::add_favorite(db, key, WhereToAdd::Path(Path::new(&path)))
+                        add::add_favorite(repo, key, WhereToAdd::Path(Path::new(&path)))
                     }
-                    (Some(key), None) => add::add_favorite(db, key, WhereToAdd::CurrentDirectory),
+                    (Some(key), None) => add::add_favorite(repo, key, WhereToAdd::CurrentDirectory),
                     _ => guide_to_help(),
                 }
             }
 
             Ok(Command::Delete) => match matches.get_value(subcommand_name, "key") {
-                Some(key) => delete::delete_from_db(db, key),
+                Some(key) => delete::delete_from_db(repo, key),
                 _ => guide_to_help(),
             },
 
@@ -53,22 +58,22 @@ fn main() {
                     matches.get_value(subcommand_name, "old_key"),
                     matches.get_value(subcommand_name, "new_key"),
                 ) {
-                    (Some(old), Some(new)) => rename::rename_favorite(db, old, new),
+                    (Some(old), Some(new)) => rename::rename_favorite(repo, old, new),
                     _ => guide_to_help(),
                 }
             }
 
-            Ok(Command::List) => list::list_favorites(db),
+            Ok(Command::List) => list::list_favorites(repo),
 
             Ok(Command::Jump) => {
                 if let Some(subcommand_matches) = matches.subcommand_matches(subcommand_name) {
                     if subcommand_matches.is_present("project-root") {
-                        jump::jump_to(db, JumpTo::ProjectRoot);
+                        jump::jump_to(repo, JumpTo::ProjectRoot);
                     } else if subcommand_matches.is_present("fuzzy-finder") {
-                        jump::jump_to(db, JumpTo::FuzzyFinder);
+                        jump::jump_to(repo, JumpTo::FuzzyFinder);
                     } else {
                         match matches.get_value(subcommand_name, "key") {
-                            Some(key) => jump::jump_to(db, JumpTo::Key(key)),
+                            Some(key) => jump::jump_to(repo, JumpTo::Key(key)),
                             _ => guide_to_help(),
                         }
                     }
@@ -77,10 +82,10 @@ fn main() {
                 }
             }
 
-            Ok(Command::Clear) => clear::clear_db(db),
+            Ok(Command::Clear) => clear::clear_db(repo),
 
             Ok(Command::Ls) => match matches.get_value(subcommand_name, "key") {
-                Some(key) => ls::ls_at_favorite(db, key),
+                Some(key) => ls::ls_at_favorite(repo, key),
                 None => guide_to_help(),
             },
 

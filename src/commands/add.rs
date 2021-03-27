@@ -8,16 +8,15 @@ use std::env;
 use std::fs;
 use std::path::Path;
 
-pub fn add_favorite<T: IRepository>(repo: T, key: String, path: WhereToAdd) -> anyhow::Result<()> {
-    if repo.exists(&key)? {
-        return Err(CommandError::GivenKeyIsAlreadyExists.into());
+pub fn add_favorite<T: IRepository>(repo: T, key: String, path: WhereToAdd) {
+    if repo.exists(&key).unwrap() {
+        return error(&CommandError::GivenKeyIsAlreadyExists.to_string());
     }
 
     match path {
         WhereToAdd::Path(path) => add_given_path_to_db(repo, key, path),
         WhereToAdd::CurrentDirectory => add_current_path_to_db(repo, key),
     }
-    Ok(())
 }
 
 fn add_path_to_db<T: IRepository>(repo: T, key: String, path: &Path) {
