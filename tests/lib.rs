@@ -14,4 +14,5 @@ pub(self) mod infrastructure {
 mod commands {
     mod add;
     mod clear;
+    mod delete;
 }
