@@ -1,7 +1,8 @@
-use sled::Db;
+use crate::{
+    command::{print_result, CommandResult},
+    domain::repository::IRepository,
+};
 
-use crate::command::{print_result, CommandResult};
-
-pub fn clear_db(db: Db) {
-    print_result(db.clear(), CommandResult::Cleared);
+pub fn clear_db<T: IRepository>(repo: T) {
+    print_result(repo.remove_all(), CommandResult::Cleared);
 }
