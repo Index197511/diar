@@ -4,7 +4,7 @@ use diar::domain::model::{Command, Favorite};
 fn test_favorite_getters() {
     let name = "name1".to_string();
     let path = "path1".to_string();
-    let favorite = Favorite::new(name.clone(), path.clone());
+    let favorite = Favorite::new(&name, &path);
 
     assert_eq!(favorite.name(), name);
     assert_eq!(favorite.path(), path);

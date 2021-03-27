@@ -1,13 +1,19 @@
-use derive_new::new;
 use strum_macros::EnumString;
 
-#[derive(new, Clone)]
+#[derive(Clone)]
 pub struct Favorite {
     name: String,
     path: String,
 }
 
 impl Favorite {
+    pub fn new(name: impl Into<String>, path: impl Into<String>) -> Favorite {
+        Favorite {
+            name: name.into(),
+            path: path.into(),
+        }
+    }
+
     pub fn name(&self) -> String {
         self.name.clone()
     }
