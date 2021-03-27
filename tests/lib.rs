@@ -18,4 +18,5 @@ mod commands {
     mod jump;
     mod list;
     mod ls;
+    mod rename;
 }
