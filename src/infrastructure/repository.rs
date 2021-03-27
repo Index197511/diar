@@ -7,13 +7,13 @@ use std::io::{Error, ErrorKind};
 pub struct Repository(pub DbHandler);
 
 impl IRepository for Repository {
-    fn add(&self, favorite: &Favorite) -> Result<()> {
+    fn add(&self, favorite: &Favorite) -> Result<Favorite> {
         match self
             .0
              .0
             .insert(favorite.name(), favorite.path().as_bytes().to_vec())
         {
-            Ok(_) => Ok(()),
+            Ok(_) => Ok(favorite.clone()),
             Err(e) => Err(e.into()),
         }
     }
@@ -49,11 +49,16 @@ impl IRepository for Repository {
         })
     }
 
-    fn remove(&self, name: &str) -> anyhow::Result<()> {
-        match self.0 .0.remove(name) {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e.into()),
-        }
+    fn remove(&self, name: &str) -> Result<Option<Favorite>> {
+        let favorite = self.0 .0.get(name)?.and_then(|path| {
+            self.0 .0.remove(name).ok()?;
+            Some(Favorite::new(
+                name.to_string(),
+                String::from_utf8(path.to_vec()).ok()?,
+            ))
+        });
+
+        Ok(favorite)
     }
 
     fn remove_all(&self) -> Result<()> {
