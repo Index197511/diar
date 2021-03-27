@@ -1,7 +1,5 @@
-use sled::Db;
+use crate::{domain::repository::IRepository, util::print_favorites};
 
-use crate::util::{get_favorites, print_favorites};
-
-pub fn list_favorites(db: Db) {
-    print_favorites(get_favorites(db))
+pub fn list_favorites<T: IRepository>(repo: T) {
+    print_favorites(repo.get_all().unwrap())
 }
