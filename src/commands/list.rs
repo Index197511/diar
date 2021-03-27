@@ -1,6 +1,5 @@
-use crate::domain::repository::IRepository;
-use crate::interface::presenter::print_favorites;
+use crate::domain::{model::Favorite, repository::IRepository};
 
-pub fn list_favorites<T: IRepository>(repo: T) {
-    print_favorites(repo.get_all().unwrap())
+pub fn list_favorites<T: IRepository>(repo: T) -> anyhow::Result<Vec<Favorite>> {
+    repo.get_all()
 }
