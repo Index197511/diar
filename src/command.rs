@@ -2,7 +2,6 @@ extern crate colored;
 
 use crate::domain::model::Command;
 use clap::{App, Arg, SubCommand};
-use colored::Colorize;
 use derive_more::Display;
 use std::path::Path;
 use thiserror::Error as ThisError;
