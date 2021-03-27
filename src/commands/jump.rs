@@ -1,10 +1,8 @@
 extern crate skim;
 
-use crate::command::JumpTo;
-use crate::{
-    domain::{repository::IRepository, service::search},
-    error::{error, suggest, GetProjectRootFailed},
-};
+use crate::command::{CommandError, JumpTo};
+use crate::domain::{repository::IRepository, service::search};
+use crate::interface::presenter::{error, suggest};
 use skim::prelude::*;
 use std::io::Cursor;
 use std::path::Path;
@@ -66,7 +64,7 @@ fn jump_to_key<T: IRepository>(repo: T, key: &str) {
     }
 }
 
-fn get_project_root_path() -> Result<String, GetProjectRootFailed> {
+fn get_project_root_path() -> anyhow::Result<String> {
     let output = Command::new("sh")
         .arg("-c")
         .arg("git rev-parse --show-toplevel")
@@ -80,22 +78,17 @@ fn get_project_root_path() -> Result<String, GetProjectRootFailed> {
                     .trim_end()
                     .to_string())
             } else {
-                Err(GetProjectRootFailed::DotGitNotFound)
+                Err(CommandError::DotGitNotFound.into())
             }
         }
-        Err(_) => Err(GetProjectRootFailed::GitCommandNotFound),
+        Err(_) => Err(CommandError::GitCommandNotFound.into()),
     }
 }
 
 fn jump_to_project_root() {
     match get_project_root_path() {
         Ok(path_string) => jump(Path::new(&path_string)),
-        Err(GetProjectRootFailed::DotGitNotFound) => {
-            error(".git directory not found.");
-        }
-        Err(GetProjectRootFailed::GitCommandNotFound) => {
-            error("Command 'git' not found.");
-        }
+        Err(e) => error(&e.to_string()),
     }
 }
 

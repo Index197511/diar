@@ -24,6 +24,12 @@ pub enum CommandError {
     GivenKeyIsAlreadyExists,
     #[display(fmt = "invalid path")]
     InvalidPath,
+    #[display(fmt = "path not found")]
+    PathNotFound,
+    #[display(fmt = "git command not found")]
+    GitCommandNotFound,
+    #[display(fmt = ".git not found")]
+    DotGitNotFound,
 }
 
 pub enum CommandResult {
@@ -31,24 +37,6 @@ pub enum CommandResult {
     Deleted(String, String),
     Cleared,
     Renamed(String, String),
-}
-
-pub fn print_result<T>(result: anyhow::Result<T>, command_result: CommandResult) {
-    match result {
-        Ok(_) => match command_result {
-            CommandResult::Added(key, path) => {
-                println!("{} {} -> {}", "added:".bold().bright_green(), key, path)
-            }
-            CommandResult::Deleted(key, path) => {
-                println!("{} {} -> {}", "deleted:".bold().bright_red(), key, path)
-            }
-            CommandResult::Cleared => println!("{}", "cleared".bold().bright_green()),
-            CommandResult::Renamed(o_key, n_key) => {
-                println!("{} {} -> {}", "rename:".bold().bright_green(), o_key, n_key)
-            }
-        },
-        Err(e) => println!("{}", e),
-    }
 }
 
 pub fn command<'a, 'b>(command: Command) -> App<'a, 'b> {

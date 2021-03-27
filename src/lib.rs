@@ -1,5 +1,4 @@
 pub mod command;
-pub mod error;
 pub mod util;
 
 pub mod commands {
@@ -21,4 +20,8 @@ pub mod domain {
 pub mod infrastructure {
     pub mod db;
     pub mod repository;
+}
+
+pub mod interface {
+    pub mod presenter;
 }

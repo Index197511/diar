@@ -1,9 +1,10 @@
 use crate::command::WhereToAdd;
+use crate::domain::repository::IRepository;
+use crate::interface::presenter::{error, print_result};
 use crate::{
-    command::{print_result, CommandError, CommandResult},
+    command::{CommandError, CommandResult},
     domain::model::Favorite,
 };
-use crate::{domain::repository::IRepository, error::error};
 use std::env;
 use std::fs;
 use std::path::Path;

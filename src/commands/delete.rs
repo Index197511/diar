@@ -1,6 +1,6 @@
-use crate::command::{print_result, CommandResult};
+use crate::command::CommandResult;
 use crate::domain::repository::IRepository;
-use crate::error::error;
+use crate::interface::presenter::{error, print_result};
 
 pub fn delete_from_db<T: IRepository>(repo: T, key: String) {
     match repo.get(&key) {

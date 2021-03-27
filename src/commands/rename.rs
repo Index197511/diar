@@ -1,8 +1,6 @@
-use crate::{
-    command::{print_result, CommandResult},
-    domain::repository::IRepository,
-};
-use crate::{domain::model::Favorite, error::error};
+use crate::domain::model::Favorite;
+use crate::interface::presenter::{error, print_result};
+use crate::{command::CommandResult, domain::repository::IRepository};
 
 pub fn rename_favorite<T: IRepository>(repo: T, old_key: String, new_key: String) {
     match repo.get(&old_key) {

@@ -1,6 +1,6 @@
 use crate::{
     domain::{repository::IRepository, service::search},
-    error::suggest,
+    interface::presenter::suggest,
 };
 use std::fs;
 
