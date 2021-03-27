@@ -1,22 +1,25 @@
 extern crate skim;
 
-use crate::command::{CommandError, JumpTo};
 use crate::domain::{repository::IRepository, service::search};
-use crate::interface::presenter::{error, suggest};
+use crate::interface::presenter::suggest;
+use crate::{
+    command::{CommandError, JumpTo},
+    domain::model::Favorite,
+};
 use skim::prelude::*;
 use std::io::Cursor;
-use std::path::Path;
+
 use std::process::Command;
 
-pub fn jump_to<T: IRepository>(repo: T, to: JumpTo) {
+pub fn jump_to<T: IRepository>(repo: T, to: JumpTo) -> anyhow::Result<String> {
     match to {
-        JumpTo::Key(key) => jump_to_key(repo, &key),
+        JumpTo::FuzzyFinder => jump_with_skim(repo).map(|fav| fav.path().to_string()),
+        JumpTo::Key(key) => jump_to_key(repo, &key).map(|fav| fav.path().to_string()),
         JumpTo::ProjectRoot => jump_to_project_root(),
-        JumpTo::FuzzyFinder => jump_with_skim(repo),
     }
 }
 
-fn jump_with_skim<T: IRepository>(repo: T) {
+fn jump_with_skim<T: IRepository>(repo: T) -> anyhow::Result<Favorite> {
     let skim_option = SkimOptionsBuilder::default()
         .height(Some("30%"))
         .multi(true)
@@ -33,33 +36,38 @@ fn jump_with_skim<T: IRepository>(repo: T) {
         .collect::<Vec<String>>();
     let items = item_reader.of_bufread(Cursor::new(favorites.join("\n")));
 
-    let selected_items = Skim::run_with(&skim_option, Some(items))
-        .map(|out| out.selected_items)
-        .unwrap_or_else(Vec::new);
+    let selected_items = Skim::run_with(&skim_option, Some(items)).map(|out| out.selected_items);
 
-    for item in selected_items {
-        println!(
-            "{}",
-            item.output()
+    let skim_error = Err(CommandError::SkimErrorOccured.into());
+    match selected_items {
+        Some(item) if !item.is_empty() => {
+            let mut favorite = item
+                .get(0)
+                .unwrap()
+                .output()
                 .into_owned()
                 .split(" -> ")
-                .collect::<Vec<&str>>()
-                .pop()
-                .unwrap()
-        );
+                .map(|s| s.to_string())
+                .collect::<Vec<String>>();
+
+            match (favorite.pop(), favorite.pop()) {
+                (Some(path), Some(key)) => Ok(Favorite::new(key, path)),
+                _ => skim_error,
+            }
+        }
+        _ => Err(CommandError::SkimErrorOccured.into()),
     }
 }
 
-fn jump_to_key<T: IRepository>(repo: T, key: &str) {
+fn jump_to_key<T: IRepository>(repo: T, key: &str) -> anyhow::Result<Favorite> {
     let maybe_path_matched = repo.get(key);
 
     match maybe_path_matched {
-        Ok(Some(favorite)) => {
-            jump(Path::new(favorite.path()));
-        }
+        Ok(Some(favorite)) => Ok(favorite),
         _ => {
-            let favorites = repo.get_all().unwrap();
+            let favorites = repo.get_all()?;
             suggest(key, search(key, favorites));
+            Err(CommandError::GivenKeyNotFound.into())
         }
     }
 }
@@ -85,13 +93,9 @@ fn get_project_root_path() -> anyhow::Result<String> {
     }
 }
 
-fn jump_to_project_root() {
+fn jump_to_project_root() -> anyhow::Result<String> {
     match get_project_root_path() {
-        Ok(path_string) => jump(Path::new(&path_string)),
-        Err(e) => error(&e.to_string()),
+        Ok(path) => Ok(path),
+        Err(e) => Err(e),
     }
-}
-
-fn jump(to: &Path) {
-    println!("{}", to.to_str().unwrap());
 }
