@@ -1,27 +1,26 @@
-use crate::error::suggest;
 use crate::util::search;
-use sled::Db;
+use crate::{domain::repository::IRepository, error::suggest};
 use std::fs;
 
-pub fn ls_at_favorite(db: Db, key: String) {
-    let target = db.get(&key);
+pub fn ls_at_favorite<T: IRepository>(repo: T, key: String) {
+    let target = repo.get(&key);
     match target {
-        Ok(Some(path)) => ls(String::from_utf8(path.to_vec()).unwrap()),
-        _ => suggest(&key, search(&key, db)),
+        Ok(Some(favorite)) => ls(favorite.path()),
+        _ => suggest(&key, search(&key, repo)),
     }
 }
 
-fn ls(path: String) {
+fn ls(path: &str) {
     let mut files: Vec<String> = Vec::new();
 
-    for p in fs::read_dir(&path).unwrap() {
+    for p in fs::read_dir(path).unwrap() {
         files.push(
             p.unwrap()
                 .path()
                 .as_path()
                 .to_str()
                 .unwrap()
-                .replace(&path, ""),
+                .replace(path, ""),
         );
     }
 
