@@ -1,8 +1,8 @@
 use clap::App;
 use clap::ArgMatches;
 use colored::Colorize;
+use diar::command::{JumpTo, WhereToAdd};
 use diar::domain::model::Command;
-use diar::types::{JumpTo, WhereToAdd};
 use diar::util::generate_path_string;
 use diar::{
     command::command,

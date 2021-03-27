@@ -5,7 +5,19 @@ use clap::{App, Arg, SubCommand};
 use colored::Colorize;
 use derive_more::Display;
 use std::fmt::Display;
+use std::path::Path;
 use thiserror::Error as ThisError;
+
+pub enum JumpTo {
+    Key(String),
+    ProjectRoot,
+    FuzzyFinder,
+}
+
+pub enum WhereToAdd<'a> {
+    Path(&'a Path),
+    CurrentDirectory,
+}
 
 #[derive(Debug, ThisError, Display)]
 pub enum CommandError {

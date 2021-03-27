@@ -1,6 +1,6 @@
 extern crate skim;
 
-use crate::types::JumpTo;
+use crate::command::JumpTo;
 use crate::util::search;
 use crate::{
     domain::repository::IRepository,

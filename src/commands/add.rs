@@ -1,4 +1,4 @@
-use crate::types::WhereToAdd;
+use crate::command::WhereToAdd;
 use crate::{
     command::{print_result, CommandError, CommandResult},
     domain::model::Favorite,
