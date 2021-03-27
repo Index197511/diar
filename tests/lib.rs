@@ -16,4 +16,5 @@ mod commands {
     mod clear;
     mod delete;
     mod jump;
+    mod list;
 }
