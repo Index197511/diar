@@ -29,6 +29,8 @@ pub enum CommandError {
     GitCommandNotFound,
     #[display(fmt = ".git not found")]
     DotGitNotFound,
+    #[display(fmt = "given key not found")]
+    GivenKeyNotFound,
 }
 
 pub enum CommandResult {
