@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod test_add_favorite {
+mod test_delete_from_db {
 
     use diar::{
         command::CommandError,
@@ -10,7 +10,7 @@ mod test_add_favorite {
     use crate::infrastructure::inmemory::repository::Repository;
 
     #[test]
-    fn test_delete_from_db() {
+    fn delete() {
         let fav = Favorite::new("name1", "/");
         let repo = &Repository::new(vec![fav.clone()]);
 
@@ -21,7 +21,7 @@ mod test_add_favorite {
     }
 
     #[test]
-    fn test_delete_from_db_return_not_found_error() {
+    fn not_found_error() {
         let fav = Favorite::new("name1", "/");
         let repo = &Repository::new(Vec::new());
 

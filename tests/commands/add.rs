@@ -11,7 +11,7 @@ mod test_add_favorite {
     use crate::infrastructure::inmemory::repository::Repository;
 
     #[test]
-    fn test_add_favorite_if_exists() {
+    fn if_exists() {
         let path = Path::new("/");
         let fav = Favorite::new("name1", path.to_str().unwrap());
 
@@ -26,7 +26,7 @@ mod test_add_favorite {
     }
 
     #[test]
-    fn test_add_favorite_with_path() {
+    fn with_path() {
         let path = Path::new("/");
         let fav = Favorite::new("name1", path.to_str().unwrap());
 
@@ -39,7 +39,7 @@ mod test_add_favorite {
     }
 
     #[test]
-    fn test_add_favorite_with_invalid_path() {
+    fn with_invalid_path() {
         let path = Path::new("invalid path");
         let fav = Favorite::new("name1", path.to_str().unwrap());
 

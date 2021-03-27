@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod test_add_favorite {
+mod test_clear_db {
 
     use diar::{
         commands::clear::clear_db,
@@ -9,7 +9,7 @@ mod test_add_favorite {
     use crate::infrastructure::inmemory::repository::Repository;
 
     #[test]
-    fn test_clear_db() {
+    fn clear() {
         let fav = Favorite::new("name1", "/");
         let repo = &Repository::new(vec![fav]);
 
