@@ -1,19 +1,16 @@
-use crate::domain::model::Favorite;
-use crate::interface::presenter::{error, print_result};
-use crate::{command::CommandResult, domain::repository::IRepository};
+use crate::domain::repository::IRepository;
+use crate::{command::CommandError, domain::model::Favorite};
 
-pub fn rename_favorite<T: IRepository>(repo: T, old_key: String, new_key: String) {
+pub fn rename_favorite<T: IRepository>(
+    repo: T,
+    old_key: String,
+    new_key: String,
+) -> anyhow::Result<Favorite> {
     match repo.get(&old_key) {
-        Ok(Some(favorite)) => {
-            print_result(
-                repo.remove(&old_key).and_then(|_| {
-                    repo.add(&Favorite::new(new_key.clone(), favorite.path().to_string()))
-                }),
-                CommandResult::Renamed(old_key, new_key),
-            );
-        }
-        _ => {
-            error(&format!("This key does not exist: {}", old_key));
-        }
+        Ok(Some(favorite)) => repo
+            .remove(&old_key)
+            .and_then(|_| repo.add(&Favorite::new(new_key.clone(), favorite.path().to_string())))
+            .map(|_| favorite),
+        _ => Err(CommandError::GivenKeyNotFound.into()),
     }
 }
