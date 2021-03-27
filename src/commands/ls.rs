@@ -1,40 +1,17 @@
 use crate::{
-    domain::{repository::IRepository, service::search},
+    command::CommandError,
+    domain::{model::Favorite, repository::IRepository, service::search},
     interface::presenter::suggest,
 };
-use std::fs;
 
-pub fn ls_at_favorite<T: IRepository>(repo: T, key: String) {
+pub fn ls_at_favorite<T: IRepository>(repo: T, key: String) -> anyhow::Result<Favorite> {
     let target = repo.get(&key);
     match target {
-        Ok(Some(favorite)) => ls(favorite.path()),
+        Ok(Some(favorite)) => Ok(favorite),
         _ => {
             let favorites = repo.get_all().unwrap();
-            suggest(&key, search(&key, favorites))
+            suggest(&key, search(&key, favorites));
+            Err(CommandError::GivenKeyNotFound.into())
         }
     }
-}
-
-fn ls(path: &str) {
-    let mut files: Vec<String> = Vec::new();
-
-    for p in fs::read_dir(path).unwrap() {
-        files.push(
-            p.unwrap()
-                .path()
-                .as_path()
-                .to_str()
-                .unwrap()
-                .replace(path, ""),
-        );
-    }
-
-    let shaped_files = files.iter().fold(String::new(), |join, s| {
-        if join == String::new() {
-            s.to_string()
-        } else {
-            join + "  " + s
-        }
-    });
-    println!("{}", shaped_files);
 }
