@@ -1,5 +1,4 @@
 pub mod command;
-pub mod util;
 
 pub mod commands {
     pub mod add;

@@ -1,12 +1,12 @@
 use clap::App;
 use clap::ArgMatches;
 use colored::Colorize;
+use diar::command::CommandResult;
 use diar::{
     command::command,
     infrastructure::{db::DbHandler, repository::Repository},
     interface::presenter::print_favorites,
 };
-use diar::{command::CommandResult, util::generate_path_string};
 use diar::{
     command::{JumpTo, WhereToAdd},
     interface::presenter,
@@ -16,6 +16,7 @@ use std::path::Path;
 use std::{fs, str::FromStr};
 
 use diar::commands::{add, clear, delete, jump, list, ls, rename};
+use dirs::home_dir;
 
 fn main() {
     let users_db_path = generate_path_string("/.diar".to_owned());
@@ -148,6 +149,10 @@ fn main() {
 
 fn guide_to_help() {
     println!("diar: try 'diar --help' for more information");
+}
+
+fn generate_path_string(s: String) -> String {
+    format!("{}{}", home_dir().unwrap().to_str().unwrap(), s)
 }
 
 trait GetFromArg {
