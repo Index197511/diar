@@ -1,23 +1,25 @@
 extern crate skim;
 
-use crate::error::{error, suggest, GetProjectRootFailed};
 use crate::types::JumpTo;
-use crate::util::{get_favorites, search};
+use crate::util::search;
+use crate::{
+    domain::repository::IRepository,
+    error::{error, suggest, GetProjectRootFailed},
+};
 use skim::prelude::*;
-use sled::Db;
 use std::io::Cursor;
 use std::path::Path;
 use std::process::Command;
 
-pub fn jump_to(db: Db, to: JumpTo) {
+pub fn jump_to<T: IRepository>(repo: T, to: JumpTo) {
     match to {
-        JumpTo::Key(key) => jump_to_key(db, &key),
+        JumpTo::Key(key) => jump_to_key(repo, &key),
         JumpTo::ProjectRoot => jump_to_project_root(),
-        JumpTo::FuzzyFinder => jump_with_skim(db),
+        JumpTo::FuzzyFinder => jump_with_skim(repo),
     }
 }
 
-fn jump_with_skim(db: Db) {
+fn jump_with_skim<T: IRepository>(repo: T) {
     let skim_option = SkimOptionsBuilder::default()
         .height(Some("30%"))
         .multi(true)
@@ -25,7 +27,10 @@ fn jump_with_skim(db: Db) {
         .unwrap();
 
     let item_reader = SkimItemReader::default();
-    let favorites = get_favorites(db)
+
+    let favorites = repo
+        .get_all()
+        .unwrap()
         .iter()
         .map(|favorite| format!("{} -> {}", favorite.name(), favorite.path()))
         .collect::<Vec<String>>();
@@ -48,16 +53,15 @@ fn jump_with_skim(db: Db) {
     }
 }
 
-fn jump_to_key(db: Db, key: &str) {
-    let maybe_path_matched = db.get(key);
+fn jump_to_key<T: IRepository>(repo: T, key: &str) {
+    let maybe_path_matched = repo.get(key);
 
     match maybe_path_matched {
-        Ok(Some(path)) => {
-            let path_string: String = String::from_utf8(path.to_vec()).unwrap();
-            jump(Path::new(&path_string));
+        Ok(Some(favorite)) => {
+            jump(Path::new(favorite.path()));
         }
         _ => {
-            suggest(key, search(key, db));
+            suggest(key, search(key, repo));
         }
     }
 }

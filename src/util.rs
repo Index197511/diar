@@ -1,24 +1,8 @@
 extern crate sled;
 
-use crate::domain::model::Favorite;
+use crate::domain::{model::Favorite, repository::IRepository};
 use dirs::home_dir;
 use sled::Db;
-
-pub fn get_favorites(db: Db) -> Vec<Favorite> {
-    let mut favorites: Vec<Favorite> = Vec::new();
-    let favorites_utf8 = db
-        .iter()
-        .filter(|maybe_favorite| maybe_favorite.is_ok())
-        .map(|ok_favorite| ok_favorite.unwrap());
-
-    for converted_favorite in favorites_utf8.map(from_utf8s) {
-        if let Some(favorite) = converted_favorite {
-            favorites.push(favorite);
-        }
-    }
-
-    favorites
-}
 
 fn from_utf8s(favorite_ivec: (sled::IVec, sled::IVec)) -> Option<Favorite> {
     let key_utf8 = favorite_ivec.0.to_vec();
@@ -36,8 +20,8 @@ pub fn print_favorites(favorites: Vec<Favorite>) {
     }
 }
 
-pub fn search(searched_word: &str, db: Db) -> Vec<Favorite> {
-    let favorites = get_favorites(db);
+pub fn search<T: IRepository>(searched_word: &str, repo: T) -> Vec<Favorite> {
+    let favorites = repo.get_all().unwrap();
 
     favorites
         .into_iter()
