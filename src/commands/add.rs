@@ -1,9 +1,13 @@
-use crate::command::WhereToAdd;
 use crate::domain::repository::IRepository;
 use crate::{command::CommandError, domain::model::Favorite};
 use std::env;
 use std::fs;
 use std::path::Path;
+
+pub enum WhereToAdd<'a> {
+    Path(&'a Path),
+    CurrentDirectory,
+}
 
 pub fn add_favorite<T: IRepository>(
     repo: T,

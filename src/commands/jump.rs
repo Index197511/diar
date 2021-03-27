@@ -1,15 +1,15 @@
-extern crate skim;
-
 use crate::domain::{repository::IRepository, service::search};
 use crate::interface::presenter::suggest;
-use crate::{
-    command::{CommandError, JumpTo},
-    domain::model::Favorite,
-};
+use crate::{command::CommandError, domain::model::Favorite};
 use skim::prelude::*;
 use std::io::Cursor;
-
 use std::process::Command;
+
+pub enum JumpTo {
+    Key(String),
+    ProjectRoot,
+    FuzzyFinder,
+}
 
 pub fn jump_to<T: IRepository>(repo: T, to: JumpTo) -> anyhow::Result<String> {
     match to {

@@ -2,21 +2,19 @@ use clap::App;
 use clap::ArgMatches;
 use colored::Colorize;
 use diar::command::CommandResult;
+use diar::commands::add::WhereToAdd;
+use diar::commands::jump::JumpTo;
+use diar::commands::{add, clear, delete, jump, list, ls, rename};
+use diar::interface::presenter;
 use diar::{
     command::command,
     infrastructure::{db::DbHandler, repository::Repository},
     interface::presenter::print_favorites,
 };
-use diar::{
-    command::{JumpTo, WhereToAdd},
-    interface::presenter,
-};
 use diar::{domain::model::Command, interface::presenter::print_result};
+use dirs::home_dir;
 use std::path::Path;
 use std::{fs, str::FromStr};
-
-use diar::commands::{add, clear, delete, jump, list, ls, rename};
-use dirs::home_dir;
 
 fn main() {
     let users_db_path = generate_path_string("/.diar".to_owned());
