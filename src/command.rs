@@ -3,7 +3,17 @@ extern crate colored;
 use crate::domain::model::Command;
 use clap::{App, Arg, SubCommand};
 use colored::Colorize;
+use derive_more::Display;
 use std::fmt::Display;
+use thiserror::Error as ThisError;
+
+#[derive(Debug, ThisError, Display)]
+pub enum CommandError {
+    #[display(fmt = "given key is already exists")]
+    GivenKeyIsAlreadyExists,
+    #[display(fmt = "invalid path")]
+    InvalidPath,
+}
 
 pub enum CommandResult {
     Added(String, String),
