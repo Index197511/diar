@@ -4,7 +4,6 @@ use crate::domain::model::Command;
 use clap::{App, Arg, SubCommand};
 use colored::Colorize;
 use derive_more::Display;
-use std::fmt::Display;
 use std::path::Path;
 use thiserror::Error as ThisError;
 
@@ -34,7 +33,7 @@ pub enum CommandResult {
     Renamed(String, String),
 }
 
-pub fn print_result<T, E: Display>(result: Result<T, E>, command_name: CommandResult) {
+pub fn print_result<T>(result: anyhow::Result<T>, command_name: CommandResult) {
     match result {
         Ok(_) => match command_name {
             CommandResult::Added(key, path) => {
