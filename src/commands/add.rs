@@ -10,7 +10,7 @@ pub fn add_favorite<T: IRepository>(
     key: String,
     path: WhereToAdd,
 ) -> anyhow::Result<Favorite> {
-    if repo.exists(&key).unwrap() {
+    if repo.exists(&key)? {
         return Err(CommandError::GivenKeyIsAlreadyExists.into());
     }
 
@@ -31,28 +31,25 @@ fn add_given_path_to_db<T: IRepository>(
 
     let favorite = Favorite::new(
         key,
-        fs::canonicalize(path)
-            .unwrap()
+        fs::canonicalize(path)?
             .as_path()
             .to_str()
             .unwrap()
             .to_owned(),
     );
 
-    match repo.add(&favorite) {
-        Ok(_) => Ok(favorite),
-        Err(e) => Err(e),
-    }
+    repo.add(&favorite).map(|_| Ok(favorite))?
 }
 
 fn add_current_path_to_db<T: IRepository>(repo: T, key: String) -> anyhow::Result<Favorite> {
     match env::current_dir() {
         Ok(current_path) => {
-            let favorite = Favorite::new(key, current_path.as_path().to_str().unwrap().to_owned());
-            match repo.add(&favorite) {
-                Ok(_) => Ok(favorite),
-                Err(e) => Err(e),
-            }
+            let favorite: anyhow::Result<Favorite> = current_path
+                .as_path()
+                .to_str()
+                .map(|path| Favorite::new(key, path.to_owned()))
+                .ok_or_else(|| CommandError::InvalidPath.into());
+            repo.add(&favorite?)
         }
         Err(e) => Err(e.into()),
     }
