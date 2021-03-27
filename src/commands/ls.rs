@@ -1,12 +1,17 @@
-use crate::util::search;
-use crate::{domain::repository::IRepository, error::suggest};
+use crate::{
+    domain::{repository::IRepository, service::search},
+    error::suggest,
+};
 use std::fs;
 
 pub fn ls_at_favorite<T: IRepository>(repo: T, key: String) {
     let target = repo.get(&key);
     match target {
         Ok(Some(favorite)) => ls(favorite.path()),
-        _ => suggest(&key, search(&key, repo)),
+        _ => {
+            let favorites = repo.get_all().unwrap();
+            suggest(&key, search(&key, favorites))
+        }
     }
 }
 

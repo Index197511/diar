@@ -1,9 +1,8 @@
 extern crate skim;
 
 use crate::command::JumpTo;
-use crate::util::search;
 use crate::{
-    domain::repository::IRepository,
+    domain::{repository::IRepository, service::search},
     error::{error, suggest, GetProjectRootFailed},
 };
 use skim::prelude::*;
@@ -61,7 +60,8 @@ fn jump_to_key<T: IRepository>(repo: T, key: &str) {
             jump(Path::new(favorite.path()));
         }
         _ => {
-            suggest(key, search(key, repo));
+            let favorites = repo.get_all().unwrap();
+            suggest(key, search(key, favorites));
         }
     }
 }
