@@ -31,6 +31,8 @@ pub enum CommandError {
     DotGitNotFound,
     #[display(fmt = "given key not found")]
     GivenKeyNotFound,
+    #[display(fmt = "skim error occured")]
+    SkimErrorOccured,
 }
 
 pub enum CommandResult {
