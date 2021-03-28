@@ -1,4 +1,4 @@
-use std::{env, process::Command};
+use std::{env, fs, path::Path, process::Command};
 
 use super::error::{CurrentDirectoryPathError, ProjectRootPathError};
 
@@ -31,4 +31,20 @@ pub fn project_root_path() -> Result<String, ProjectRootPathError> {
         }
         Err(_) => Err(ProjectRootPathError::GitCommandNotFound),
     }
+}
+
+pub fn absolute(path_str: &str) -> Option<String> {
+    let path = Path::new(path_str);
+    if path.is_absolute() {
+        return Some(path.to_str().to_owned()?.to_string());
+    }
+
+    Some(
+        fs::canonicalize(Path::new(path))
+            .ok()?
+            .as_path()
+            .to_str()
+            .unwrap()
+            .to_owned(),
+    )
 }
