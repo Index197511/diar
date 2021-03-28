@@ -1,9 +1,8 @@
-use super::db::DbHandler;
+use super::{db::DbHandler, error::InfraError};
 use crate::domain::model::Favorite;
 use crate::domain::repository::IRepository;
 use anyhow::Result;
 use derive_new::new;
-use std::io::{Error, ErrorKind};
 
 #[derive(new)]
 pub struct Repository {
@@ -26,18 +25,15 @@ impl IRepository for Repository {
         let mut favorites: Vec<Favorite> = Vec::new();
         for favorite in self.db.handler.iter() {
             if let Ok((k, v)) = favorite {
-                if let (Ok(name), Ok(path)) =
-                    (String::from_utf8(k.to_vec()), String::from_utf8(v.to_vec()))
-                {
-                    favorites.push(Favorite::new(name, path))
-                }
+                let name = String::from_utf8(k.to_vec())?;
+                let path = String::from_utf8(v.to_vec())?;
+
+                favorites.push(Favorite::new(name, path))
             }
         }
 
         if favorites.is_empty() {
-            return Err(
-                sled::Error::Io(Error::new(ErrorKind::NotFound, "favorites not found")).into(),
-            );
+            return Err(InfraError::FavoritesNotFound.into());
         }
 
         Ok(favorites)
