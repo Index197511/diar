@@ -17,11 +17,12 @@ use std::path::Path;
 use std::{fs, str::FromStr};
 
 fn main() {
-    let users_db_path = generate_path_string("/.diar".to_owned());
-    let db_path = Path::new(&users_db_path);
     rename_diar_directory();
-    let db = sled::open(&db_path).unwrap();
-    let repo = Repository(DbHandler(db));
+
+    let directory_name = "/.diar";
+    //TODO: show error message
+    let handler = DbHandler::new(directory_name).unwrap();
+    let repo = Repository::new(handler);
 
     let app = App::new("diar")
         .version("2.3.0")
