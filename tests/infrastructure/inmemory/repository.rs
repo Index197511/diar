@@ -11,11 +11,13 @@ pub enum InmemoryRepositoryError {
     AlreadyExists,
 }
 
-pub struct Repository(pub Db);
+pub struct Repository {
+    pub db: Db,
+}
 
 impl Repository {
     pub fn new(init: Vec<Favorite>) -> Self {
-        Repository(Db::new(init))
+        Repository { db: Db::new(init) }
     }
 }
 
@@ -24,13 +26,14 @@ impl IRepository for Repository {
         &self,
         favorite: &diar::domain::model::Favorite,
     ) -> anyhow::Result<diar::domain::model::Favorite> {
-        match self.0 .0.lock() {
+        match self.db.handler.lock() {
             Ok(mut db) => {
-                if db
+                let exists = db
                     .iter()
                     .map(|fav| fav.name())
-                    .any(|x| x == favorite.name())
-                {
+                    .any(|x| x == favorite.name());
+
+                if exists {
                     Err(InmemoryRepositoryError::AlreadyExists.into())
                 } else {
                     db.push(favorite.clone());
@@ -42,20 +45,21 @@ impl IRepository for Repository {
     }
 
     fn get_all(&self) -> anyhow::Result<Vec<diar::domain::model::Favorite>> {
-        match self.0 .0.lock() {
+        match self.db.handler.lock() {
             Ok(db) => Ok(db.clone()),
             Err(_) => Err(InmemoryRepositoryError::InternalError.into()),
         }
     }
 
     fn get(&self, name: &str) -> anyhow::Result<Option<diar::domain::model::Favorite>> {
-        match self.0 .0.lock() {
+        match self.db.handler.lock() {
             Ok(db) => {
                 let filtered = db
                     .clone()
                     .into_iter()
                     .filter(|favorite| -> bool { favorite.name() == name })
                     .collect::<Vec<Favorite>>();
+
                 if filtered.is_empty() {
                     Ok(None)
                 } else {
@@ -67,13 +71,14 @@ impl IRepository for Repository {
     }
 
     fn remove(&self, name: &str) -> anyhow::Result<Option<diar::domain::model::Favorite>> {
-        match self.0 .0.lock() {
+        match self.db.handler.lock() {
             Ok(mut db) => {
                 let got = db
                     .clone()
                     .into_iter()
                     .filter(|favorite| -> bool { favorite.name() == name })
                     .collect::<Vec<Favorite>>();
+
                 if got.is_empty() {
                     Ok(None)
                 } else {
@@ -86,7 +91,7 @@ impl IRepository for Repository {
     }
 
     fn remove_all(&self) -> anyhow::Result<()> {
-        match self.0 .0.lock() {
+        match self.db.handler.lock() {
             Ok(mut db) => {
                 db.clear();
                 Ok(())
@@ -96,7 +101,7 @@ impl IRepository for Repository {
     }
 
     fn exists(&self, name: &str) -> anyhow::Result<bool> {
-        match self.0 .0.lock() {
+        match self.db.handler.lock() {
             Ok(db) => Ok(db
                 .clone()
                 .into_iter()

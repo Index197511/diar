@@ -1,6 +1,5 @@
-use std::{env, fs, path::Path, process::Command};
-
 use super::error::{CurrentDirectoryPathError, ProjectRootPathError};
+use std::{env, fs, path::Path, process::Command};
 
 pub fn current_path() -> Result<String, CurrentDirectoryPathError> {
     match env::current_dir() {
@@ -33,7 +32,7 @@ pub fn project_root_path() -> Result<String, ProjectRootPathError> {
     }
 }
 
-pub fn absolute(path_str: &str) -> Option<String> {
+pub fn to_absolute(path_str: &str) -> Option<String> {
     let path = Path::new(path_str);
     if path.is_absolute() {
         return Some(path.to_str().to_owned()?.to_string());
