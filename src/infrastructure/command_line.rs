@@ -47,8 +47,7 @@ impl ICommandLineHandler for CommandLineHandler {
             fs::canonicalize(Path::new(path))
                 .ok()?
                 .as_path()
-                .to_str()
-                .unwrap()
+                .to_str()?
                 .to_owned(),
         )
     }
