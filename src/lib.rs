@@ -17,9 +17,9 @@ pub mod domain {
 }
 
 pub mod infrastructure {
+    pub mod command_line;
     pub mod db;
     pub mod error;
-    pub mod path;
     pub mod repository;
 }
 
