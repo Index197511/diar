@@ -21,7 +21,7 @@ fn main() {
 
     let directory_name = "/.diar";
     //TODO: show error message
-    let handler = DbHandler::new(directory_name).unwrap();
+    let handler = DbHandler::open(directory_name).unwrap();
     let repo = Repository::new(handler);
 
     let app = App::new("diar")
@@ -44,9 +44,11 @@ fn main() {
                     matches.get_value(subcommand_name, "key"),
                     matches.get_value(subcommand_name, "path"),
                 ) {
+                    //TODO: この分岐はControllerとして別の部分で行う
                     (Some(key), Some(path)) => {
                         match add::add_favorite(&repo, key, WhereToAdd::Path(Path::new(&path))) {
                             Ok(favorite) => {
+                                //TODO: CommandResultみたいなのはPresenterに返させて、print_resultはinfraでUIと同様に実装するべき？
                                 print_result(CommandResult::Added(favorite.name(), favorite.path()))
                             }
                             Err(e) => presenter::error(&e.to_string()),
