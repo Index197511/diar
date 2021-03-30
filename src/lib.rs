@@ -11,6 +11,7 @@ pub mod commands {
 }
 
 pub mod domain {
+    pub mod command_line;
     pub mod model;
     pub mod repository;
     pub mod service;

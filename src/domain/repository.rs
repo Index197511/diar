@@ -1,5 +1,6 @@
 use super::model::Favorite;
 use anyhow::Result;
+
 pub trait IRepository {
     fn add(&self, favorite: &Favorite) -> Result<Favorite>;
     fn get_all(&self) -> Result<Vec<Favorite>>;

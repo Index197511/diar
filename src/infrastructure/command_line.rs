@@ -1,20 +1,22 @@
 use super::error::{CurrentDirectoryPathError, ProjectRootPathError};
+use crate::domain::command_line::ICommandLineHandler;
+use anyhow::Result;
 use std::{env, fs, path::Path, process::Command};
 
 pub struct CommandLineHandler;
 
-impl CommandLineHandler {
-    pub fn current_path() -> Result<String, CurrentDirectoryPathError> {
+impl ICommandLineHandler for CommandLineHandler {
+    fn current_path() -> Result<String> {
         match env::current_dir() {
             Ok(current_path) => match current_path.to_str() {
                 Some(path) => Ok(path.to_owned()),
-                None => Err(CurrentDirectoryPathError::ConnotConvertToString),
+                None => Err(CurrentDirectoryPathError::ConnotConvertToString.into()),
             },
-            Err(_) => Err(CurrentDirectoryPathError::CannotAccessCurrentDirectory),
+            Err(_) => Err(CurrentDirectoryPathError::CannotAccessCurrentDirectory.into()),
         }
     }
 
-    pub fn project_root_path() -> Result<String, ProjectRootPathError> {
+    fn project_root_path() -> Result<String> {
         let output = Command::new("sh")
             .arg("-c")
             .arg("git rev-parse --show-toplevel")
@@ -25,17 +27,17 @@ impl CommandLineHandler {
                 if output.status.success() {
                     match String::from_utf8(output.stdout) {
                         Ok(path) => Ok(path.trim_end().to_string()),
-                        Err(_) => Err(ProjectRootPathError::ConnotConvertToString),
+                        Err(_) => Err(ProjectRootPathError::ConnotConvertToString.into()),
                     }
                 } else {
-                    Err(ProjectRootPathError::DotGitNotFound)
+                    Err(ProjectRootPathError::DotGitNotFound.into())
                 }
             }
-            Err(_) => Err(ProjectRootPathError::GitCommandNotFound),
+            Err(_) => Err(ProjectRootPathError::GitCommandNotFound.into()),
         }
     }
 
-    pub fn be_absolute_from(path_str: &str) -> Option<String> {
+    fn be_absolute_from(path_str: &str) -> Option<String> {
         let path = Path::new(path_str);
         if path.is_absolute() {
             return Some(path.to_str().to_owned()?.to_string());
