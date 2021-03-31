@@ -68,7 +68,7 @@ impl IRepository for Repository {
         }
     }
 
-    fn exists(&self, name: &str) -> Result<bool> {
+    fn is_exist(&self, name: &str) -> Result<bool> {
         match self.db.handler.get(name)? {
             Some(_) => Ok(true),
             None => Ok(false),

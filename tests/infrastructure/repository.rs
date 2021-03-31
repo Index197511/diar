@@ -68,5 +68,5 @@ pub fn test_exists() {
     let fav1 = Favorite::new("name1", "path1");
     let repo = Repository::new(vec![fav1.clone()]);
 
-    assert!(repo.exists(&fav1.name()).unwrap());
+    assert!(repo.is_exist(&fav1.name()).unwrap());
 }

@@ -100,7 +100,7 @@ impl IRepository for Repository {
         }
     }
 
-    fn exists(&self, name: &str) -> anyhow::Result<bool> {
+    fn is_exist(&self, name: &str) -> anyhow::Result<bool> {
         match self.db.handler.lock() {
             Ok(db) => Ok(db
                 .clone()

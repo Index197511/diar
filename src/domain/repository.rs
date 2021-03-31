@@ -7,5 +7,5 @@ pub trait IRepository {
     fn get(&self, name: &str) -> Result<Option<Favorite>>;
     fn remove(&self, name: &str) -> Result<Option<Favorite>>;
     fn remove_all(&self) -> Result<()>;
-    fn exists(&self, name: &str) -> Result<bool>;
+    fn is_exist(&self, name: &str) -> Result<bool>;
 }

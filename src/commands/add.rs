@@ -14,7 +14,7 @@ pub fn add_favorite<T: IRepository>(
     key: String,
     path: WhereToAdd,
 ) -> anyhow::Result<Favorite> {
-    if repo.exists(&key)? {
+    if repo.is_exist(&key)? {
         return Err(CommandError::GivenKeyIsAlreadyExists.into());
     }
 
