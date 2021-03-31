@@ -9,7 +9,7 @@ pub fn ls_at_favorite<T: IRepository>(repo: &T, key: String) -> anyhow::Result<F
     match target {
         Ok(Some(favorite)) => Ok(favorite),
         _ => {
-            let favorites = repo.get_all().unwrap();
+            let favorites = repo.get_all()?;
             suggest(&key, search(&key, favorites));
             Err(CommandError::GivenKeyNotFound.into())
         }
