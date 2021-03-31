@@ -1,6 +1,7 @@
 use crate::domain::{repository::IRepository, service::search};
 use crate::interface::presenter::suggest;
 use crate::{command::CommandError, domain::model::Favorite};
+use anyhow::Error;
 use skim::prelude::*;
 use std::io::Cursor;
 use std::process::Command;
@@ -29,11 +30,11 @@ fn jump_with_skim<T: IRepository>(repo: &T) -> anyhow::Result<Favorite> {
     let item_reader = SkimItemReader::default();
 
     let favorites = repo
-        .get_all()
-        .unwrap()
+        .get_all()?
         .iter()
         .map(|favorite| format!("{} -> {}", favorite.name(), favorite.path()))
         .collect::<Vec<String>>();
+
     let items = item_reader.of_bufread(Cursor::new(favorites.join("\n")));
 
     let selected_items = Skim::run_with(&skim_option, Some(items)).map(|out| out.selected_items);
@@ -43,7 +44,7 @@ fn jump_with_skim<T: IRepository>(repo: &T) -> anyhow::Result<Favorite> {
         Some(item) if !item.is_empty() => {
             let mut favorite = item
                 .get(0)
-                .unwrap()
+                .ok_or_else(|| -> Error { CommandError::SkimErrorOccured.into() })?
                 .output()
                 .into_owned()
                 .split(" -> ")
