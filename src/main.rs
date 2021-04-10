@@ -1,162 +1,157 @@
-extern crate clap;
-extern crate sled;
-
+use clap::App;
 use clap::ArgMatches;
-use clap::{App, Arg, SubCommand};
-use diar::command::{to_command, Command};
-use diar::types::{JumpTo, WhereToAdd};
-use diar::util::generate_path_string;
-use sled::Db;
-use std::fs;
-use std::path::Path;
 use colored::Colorize;
-
-mod add;
-mod clear;
-mod delete;
-mod jump;
-mod list;
-mod ls;
-mod rename;
+use diar::command::CommandResult;
+use diar::commands::add::WhereToAdd;
+use diar::commands::jump::JumpTo;
+use diar::commands::{add, clear, delete, jump, list, ls, rename};
+use diar::interface::presenter;
+use diar::{
+    command::command,
+    infrastructure::{db::DbHandler, repository::Repository},
+    interface::presenter::print_favorites,
+};
+use diar::{domain::model::Command, interface::presenter::print_result};
+use dirs::home_dir;
+use std::path::Path;
+use std::{fs, str::FromStr};
 
 fn main() {
-    let users_db_path = generate_path_string("/.diar".to_owned());
-    let db_path = Path::new(&users_db_path);
     rename_diar_directory();
-    let db = Db::open(&db_path).unwrap();
+
+    let directory_name = "/.diar";
+    //TODO: show error message
+    let handler = DbHandler::open(directory_name).unwrap();
+    let repo = Repository::new(handler);
+
     let app = App::new("diar")
-        .version("2.2.0")
+        .version("2.3.0")
         .author("Index197511 and 4afS")
         .about("A directory favorite tool in Rust.")
-        .subcommand(
-            SubCommand::with_name("add")
-                .about("Add a directory you like to favorite")
-                .arg(
-                    Arg::with_name("path")
-                        .help("absolute path")
-                        .short("p")
-                        .long("path")
-                        .takes_value(true),
-                )
-                .arg(
-                    Arg::with_name("key")
-                        .help("key to directory")
-                        .takes_value(true)
-                        .required(true),
-                ),
-        )
-        .subcommand(
-            SubCommand::with_name("delete")
-                .about("Delete a directory from favorite")
-                .arg(
-                    Arg::with_name("key")
-                        .help("named directory")
-                        .takes_value(true)
-                        .required(true),
-                ),
-        )
-        .subcommand(
-            SubCommand::with_name("rename")
-                .about("Rename favorite directory")
-                .arg(
-                    Arg::with_name("old_key")
-                        .help("old key to favorite directory")
-                        .takes_value(true)
-                        .required(true),
-                )
-                .arg(
-                    Arg::with_name("new_key")
-                        .help("new key to favorite directory")
-                        .takes_value(true)
-                        .required(true),
-                ),
-        )
-        .subcommand(SubCommand::with_name("list").about("List favorite directories"))
-        .subcommand(
-            SubCommand::with_name("jump")
-                .about("Jump to your favorite directory or root directory of the project")
-                .arg(
-                    Arg::with_name("key")
-                        .help("favorite dirs key")
-                        .takes_value(true),
-                )
-                .arg(
-                    Arg::with_name("project-root")
-                        .help("The current project root directory")
-                        .long("project-root")
-                        .short("p"),
-                ),
-        )
-        .subcommand(SubCommand::with_name("clear").about("Delete all favorite directories."))
-        .subcommand(
-            SubCommand::with_name("ls")
-                .about("ls your favorite directory")
-                .arg(
-                    Arg::with_name("key")
-                        .help("favorite dir's key")
-                        .takes_value(true)
-                        .required(true),
-                ),
-        );
+        .subcommand(command(Command::Add))
+        .subcommand(command(Command::Delete))
+        .subcommand(command(Command::Rename))
+        .subcommand(command(Command::List))
+        .subcommand(command(Command::Jump))
+        .subcommand(command(Command::Clear))
+        .subcommand(command(Command::Ls));
 
     let matches = app.get_matches();
-
     match matches.subcommand_name() {
-        Some(subcommand_name) => match to_command(subcommand_name) {
-            Some(Command::Add) => {
-                if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    match matches.get_value(subcommand_name, "path") {
-                        Some(given_path) => {
-                            add::add_favorite(db, key, WhereToAdd::Path(Path::new(&given_path)))
+        Some(subcommand_name) => match Command::from_str(subcommand_name) {
+            Ok(Command::Add) => {
+                match (
+                    matches.get_value(subcommand_name, "key"),
+                    matches.get_value(subcommand_name, "path"),
+                ) {
+                    //TODO: この分岐はControllerとして別の部分で行う
+                    (Some(key), Some(path)) => {
+                        match add::add_favorite(&repo, key, WhereToAdd::Path(Path::new(&path))) {
+                            Ok(favorite) => {
+                                //TODO: CommandResultみたいなのはPresenterに返させて、print_resultはinfraでUIと同様に実装するべき？
+                                print_result(CommandResult::Added(favorite.name(), favorite.path()))
+                            }
+                            Err(e) => presenter::error(&e.to_string()),
                         }
-                        None => add::add_favorite(db, key, WhereToAdd::CurrentDirectory),
                     }
-                }
-            }
-
-            Some(Command::Delete) => {
-                if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    delete::delete_from_db(db, key);
-                }
-            }
-
-            Some(Command::Rename) => {
-                if let Some(old_key) = matches.get_value(subcommand_name, "old_key") {
-                    if let Some(new_key) = matches.get_value(subcommand_name, "new_key") {
-                        rename::rename_favorite(db, old_key, new_key);
+                    (Some(key), None) => {
+                        match add::add_favorite(&repo, key, WhereToAdd::CurrentDirectory) {
+                            Ok(favorite) => {
+                                print_result(CommandResult::Added(favorite.name(), favorite.path()))
+                            }
+                            Err(e) => presenter::error(&e.to_string()),
+                        }
                     }
+                    _ => guide_to_help(),
                 }
             }
 
-            Some(Command::List) => list::list_favorites(db),
+            Ok(Command::Delete) => match matches.get_value(subcommand_name, "key") {
+                Some(key) => match delete::delete_from_db(&repo, key) {
+                    Ok(favorite) => {
+                        print_result(CommandResult::Deleted(favorite.name(), favorite.path()))
+                    }
+                    Err(e) => presenter::error(&e.to_string()),
+                },
+                _ => guide_to_help(),
+            },
 
-            Some(Command::Jump) => {
+            Ok(Command::Rename) => {
+                match (
+                    matches.get_value(subcommand_name, "old_key"),
+                    matches.get_value(subcommand_name, "new_key"),
+                ) {
+                    (Some(old), Some(new)) => {
+                        match rename::rename_favorite(&repo, old, new.clone()) {
+                            Ok(favorite) => {
+                                print_result(CommandResult::Renamed(favorite.name(), new))
+                            }
+                            Err(e) => presenter::error(&e.to_string()),
+                        }
+                    }
+                    _ => guide_to_help(),
+                }
+            }
+
+            Ok(Command::List) => match list::list_favorites(&repo) {
+                Ok(favorites) => print_favorites(favorites),
+                Err(e) => presenter::error(&e.to_string()),
+            },
+
+            Ok(Command::Jump) => {
                 if let Some(subcommand_matches) = matches.subcommand_matches(subcommand_name) {
                     if subcommand_matches.is_present("project-root") {
-                        jump::jump_to(db, JumpTo::ProjectRoot);
+                        match jump::jump_to(&repo, JumpTo::ProjectRoot) {
+                            Ok(path) => println!("{}", path),
+                            Err(e) => presenter::error(&e.to_string()),
+                        };
+                    } else if subcommand_matches.is_present("fuzzy-finder") {
+                        match jump::jump_to(&repo, JumpTo::FuzzyFinder) {
+                            Ok(path) => println!("{}", path),
+                            Err(e) => presenter::error(&e.to_string()),
+                        };
                     } else {
-                        if let Some(key) = matches.get_value(subcommand_name, "key") {
-                            jump::jump_to(db, JumpTo::Key(key));
+                        match matches.get_value(subcommand_name, "key") {
+                            Some(key) => match jump::jump_to(&repo, JumpTo::Key(key)) {
+                                Ok(path) => println!("{}", path),
+                                Err(e) => presenter::error(&e.to_string()),
+                            },
+                            _ => guide_to_help(),
                         }
                     }
+                } else {
+                    guide_to_help();
                 }
             }
 
-            Some(Command::Clear) => clear::clear_db(db),
+            Ok(Command::Clear) => match clear::clear_db(&repo) {
+                Ok(_) => print_result(CommandResult::Cleared),
+                Err(e) => presenter::error(&e.to_string()),
+            },
 
-            Some(Command::Ls) => {
-                if let Some(key) = matches.get_value(subcommand_name, "key") {
-                    ls::ls_at_favorite(db, key);
-                }
-            }
+            Ok(Command::Ls) => match matches.get_value(subcommand_name, "key") {
+                Some(key) => match ls::ls_at_favorite(&repo, key) {
+                    Ok(favorite) => presenter::ls(&favorite.path()),
+                    Err(e) => presenter::error(&e.to_string()),
+                },
+                None => guide_to_help(),
+            },
 
-            None => (),
+            Err(_) => guide_to_help(),
         },
 
         None => {
-            println!("diar: try 'diar --help' for more information");
+            guide_to_help();
         }
     }
+}
+
+fn guide_to_help() {
+    println!("diar: try 'diar --help' for more information");
+}
+
+fn generate_path_string(s: String) -> String {
+    format!("{}{}", home_dir().unwrap().to_str().unwrap(), s)
 }
 
 trait GetFromArg {

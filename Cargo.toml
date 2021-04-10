@@ -1,6 +1,6 @@
 [package]
 name = "diar"
-version = "2.2.0"
+version = "2.3.0"
 authors = ["index197511", "4afS"]
 edition = "2018"
 license = "MIT"
@@ -10,7 +10,16 @@ readme = "README.md"
 keywords = ["directory", "bookmark", "rust"]
 
 [dependencies]
-sled = "0.27"
-clap = "2.31"
-dirs = "2.0.2"
-colored = "1.8.0"
+sled = "0.34.6"
+clap = "2.33.3"
+dirs = "3.0.1"
+colored = "2.0.0"
+skim = "0.9.3"
+derive-new = "0.5.9"
+derive_more = "0.99.13"
+getset = "0.1.1"
+thiserror = "1.0.24"
+anyhow = "1.0.40"
+strum_macros = "0.20"
+strum = { version = "0.20", features = ["derive"] }
+
